@@ -1,0 +1,276 @@
+#pragma once
+
+#include "defines.h"
+#include "match/bot/config.h"
+#include "match/bot/entity_count.h"
+#include "match/state/match.h"
+#include "container/fixed_queue.h"
+
+#define BOT_MAX_RESERVATION_REQUESTS 128
+#define BOT_MAX_RALLY_REQUESTS 16
+#define BOT_MAX_ENTITIES_ASSUMED_TO_BE_SCOUTED 32
+#define BOT_MAX_BASE_INFO 32
+#define BOT_MAX_SQUADS 32
+#define BOT_MAX_DESIRED_SQUADS 8
+#define BOT_ENTITY_RESERVED_BITSET_SIZE (ID_MAX / 32)
+
+const int BOT_SQUAD_ID_NULL = -1;
+
+const uint32_t BOT_BASE_HAS_SURROUNDING_HALL = 1 << 0U;
+const uint32_t BOT_BASE_IS_SATURATED = 1 << 1U;
+const uint32_t BOT_BASE_HAS_GOLD = 1 << 2U;
+const uint32_t BOT_BASE_IS_LOW_ON_GOLD = 1 << 3U;
+const uint32_t BOT_BASE_IS_UNDER_ATTACK = 1 << 4U;
+const uint32_t BOT_BASE_HAS_BEEN_SCOUTED = 1 << 5U;
+
+enum BotSquadType {
+    BOT_SQUAD_TYPE_ATTACK,
+    BOT_SQUAD_TYPE_DEFEND,
+    BOT_SQUAD_TYPE_RESERVES,
+    BOT_SQUAD_TYPE_LANDMINES,
+    BOT_SQUAD_TYPE_RETURN,
+    BOT_SQUAD_TYPE_PATROL,
+    BOT_SQUAD_TYPE_COUNT
+};
+
+struct BotAddSquadParams {
+    BotSquadType type;
+    ivec2 target_cell;
+    ivec2 patrol_cell;
+    EntityList entity_list;
+};
+
+struct BotSquad {
+    int id;
+    BotSquadType type;
+    ivec2 target_cell;
+    ivec2 patrol_cell;
+    EntityList entity_list;
+};
+
+struct BotDesiredSquad {
+    BotSquadType type;
+    EntityCount entity_count;
+};
+
+struct BotBaseInfo {
+    EntityId goldmine_id;
+    uint8_t controlling_player;
+    uint8_t retreat_count;
+    uint32_t flags;
+    int defense_score;
+    EntityList retreat_entity_list;
+    uint32_t retreat_time;
+};
+
+struct BotReservationRequest {
+    EntityId entity_id;
+    bool value;
+};
+
+struct Bot {
+    BotConfig config;
+
+    // Note on padding:
+    // player_id + padding + scout_id = 4 byte aligned
+    uint8_t player_id;
+    uint8_t padding;
+
+    // Scouting
+    EntityId scout_id;
+    uint32_t scout_info;
+    uint32_t last_scout_time;
+    EntityList entities_to_scout;
+    FixedVector<EntityId, BOT_MAX_ENTITIES_ASSUMED_TO_BE_SCOUTED> entities_assumed_to_be_scouted;
+
+    // Reservations
+    uint32_t entity_reserved_bitset[BOT_ENTITY_RESERVED_BITSET_SIZE];
+
+    // Production
+    BotUnitComp unit_comp;
+    EntityCount desired_buildings;
+    EntityCount desired_army_ratio;
+    FixedVector<BotDesiredSquad, BOT_MAX_DESIRED_SQUADS> desired_squads;
+    FixedQueue<EntityId, BOT_MAX_RALLY_REQUESTS> buildings_to_set_rally_points;
+    uint32_t macro_cycle_timer;
+    uint32_t macro_cycle_count;
+
+    // Squads
+    int next_squad_id;
+    FixedVector<BotSquad, BOT_MAX_SQUADS> squads;
+    uint32_t next_landmine_time;
+
+    // Base info
+    FixedVector<BotBaseInfo, BOT_MAX_BASE_INFO> base_info;
+};
+
+Bot bot_empty();
+Bot bot_init(const MatchState& state, uint8_t player_id, BotConfig config);
+MatchInput bot_get_turn_input(const MatchState& state, Bot& bot, uint32_t match_timer);
+
+// Strategy
+
+void bot_strategy_update(const MatchState& state, Bot& bot);
+bool bot_should_surrender(const MatchState& state, const Bot& bot, uint32_t match_timer);
+bool bot_has_non_miner_army(const MatchState& state, const Bot& bot);
+bool bot_is_mining(const MatchState& state, const Bot& bot);
+bool bot_should_expand(const MatchState& state, const Bot& bot);
+bool bot_should_tech_into_preferred_unit_comp(const MatchState& state, const Bot& bot);
+uint32_t bot_get_player_mining_base_count(const Bot& bot, uint8_t player_id);
+bool bot_are_bases_fully_saturated(const Bot& bot);
+uint32_t bot_get_low_on_gold_base_count(const Bot& bot);
+uint32_t bot_get_max_enemy_mining_base_count(const MatchState& state, const Bot& bot);
+bool bot_has_base_that_is_missing_a_hall(const Bot& bot, EntityId* goldmine_id = NULL);
+bool bot_is_unoccupied_goldmine_available(const Bot& bot);
+uint32_t bot_get_least_defended_enemy_base_info_index(const MatchState& state, const Bot& bot);
+bool bot_is_under_attack(const Bot& bot);
+void bot_defend_location(const MatchState& state, Bot& bot, ivec2 location, uint32_t options);
+int bot_score_entities_at_location(const MatchState& state, const Bot& bot, ivec2 location, std::function<bool(const Entity& entity, EntityId entity_id)> filter);
+bool bot_should_attack(const MatchState& state, const Bot& bot);
+bool bot_should_all_in(const Bot& bot);
+
+// Production
+
+MatchInput bot_get_production_input(const MatchState& state, Bot& bot, uint32_t match_timer);
+void bot_set_unit_comp(Bot& bot, BotUnitComp unit_comp);
+void bot_update_desired_production(Bot& bot);
+
+// Saturate bases
+
+MatchInput bot_saturate_bases(const MatchState& state, Bot& bot);
+ivec2 bot_get_position_near_hall_away_from_miners(const MatchState& state, ivec2 hall_cell, ivec2 goldmine_cell);
+EntityId bot_find_nearest_idle_worker(const MatchState& state, const Bot& bot, ivec2 cell);
+
+// Build buildings
+
+bool bot_should_build_house(const MatchState& state, const Bot& bot);
+MatchInput bot_build_building(const MatchState& state, Bot& bot, EntityType building_type);
+bool bot_is_building_location_valid(const MatchState& state, ivec2 cell, int size);
+ivec2 bot_find_building_location(const MatchState& state, ivec2 start_cell, int size);
+uint32_t bot_find_hall_index_with_least_nearby_buildings(const MatchState& state, uint8_t bot_player_id, bool count_bunkers_only);
+ivec2 bot_find_hall_location(const MatchState& state, const Bot& bot);
+EntityId bot_find_goldmine_for_next_expansion(const MatchState& state, const Bot& bot);
+bool bot_is_goldmine_a_preferred_over_b(const MatchState& state, ivec2 reference_cell, EntityId goldmine_a_id, EntityId goldmine_b_id);
+EntityId bot_find_builder(const MatchState& state, const Bot& bot, ivec2 near_cell);
+ivec2 bot_find_bunker_location(const MatchState& state, const Bot& bot, uint32_t nearby_hall_index);
+
+// Research upgrades
+
+uint32_t bot_get_desired_upgrade(const MatchState& state, const Bot& bot, EntityCount unreserved_and_in_progress_entity_count);
+MatchInput bot_research_upgrade(const MatchState& state, Bot& bot, uint32_t upgrade);
+
+// Train Units
+
+bool bot_has_building_available_to_train_units(const Bot& bot, EntityCount desired_entities, EntityCount available_building_count, EntityCount unreserved_and_in_progress_entity_count);
+EntityType bot_get_unit_type_to_train(Bot& bot, EntityCount desired_entities, EntityCount available_building_count, EntityCount unreserved_and_in_progress_entity_count);
+MatchInput bot_train_unit(const MatchState& state, Bot& bot, EntityType unit_type, uint32_t match_time_minutes);
+
+// Squads
+
+const char* bot_squad_type_str(BotSquadType type);
+BotSquadType bot_squad_type_from_str(const char* str);
+
+int bot_add_squad(Bot& bot, BotAddSquadParams params);
+void bot_squad_dissolve(Bot& bot, BotSquad& squad);
+bool bot_squad_remove_entity_by_id(Bot& bot, BotSquad& squad, EntityId entity_id);
+MatchInput bot_squad_update(const MatchState& state, Bot& bot, BotSquad& squad, uint32_t match_timer);
+void bot_squad_remove_dead_units(const MatchState& state, BotSquad& squad);
+bool bot_squad_is_entity_near_squad(const MatchState& state, const BotSquad& squad, const Entity& entity);
+EntityList bot_squad_get_nearby_enemy_list(const MatchState& state, const Bot& bot, const BotSquad& squad);
+bool bot_squad_should_retreat(const MatchState& state, const Bot& bot, const BotSquad& squad, int nearby_enemy_score);
+MatchInput bot_squad_bunker_micro(const MatchState& state, const Bot& bot, const BotSquad& squad);
+EntityId bot_squad_get_bunker_id(const MatchState& state, const BotSquad& squad);
+bool bot_squad_has_bunker(const MatchState& state, const BotSquad& squad);
+bool bot_squad_bunker_units_are_engaged(const MatchState& state, const BotSquad& squad, const Entity& bunker, EntityId bunker_id);
+uint32_t bot_squad_get_carrier_capacity(const MatchState& state, const BotSquad& squad, const Entity& carrier, EntityId carrier_id);
+bool bot_squad_carrier_has_capacity(const MatchState& state, const BotSquad& squad, const Entity& carrier, EntityId carrier_id);
+MatchInput bot_squad_garrison_into_carrier(const MatchState& state, const BotSquad& squad, const Entity& carrier, EntityId carrier_id, const EntityList& entity_list);
+bool bot_squad_carrier_has_en_route_infantry(const MatchState& state, const BotSquad& squad, const Entity& carrier, EntityId carrier_id, ivec2* en_route_infantry_center);
+MatchInput bot_squad_move_carrier_toward_en_route_infantry(const MatchState& state, const Entity& carrier, EntityId carrier_id, ivec2 en_route_infantry_center);
+bool bot_squad_should_carrier_unload_garrisoned_units(const MatchState& state, const BotSquad& squad, const Entity& carrier);
+MatchInput bot_squad_pyro_micro(const MatchState& state, Bot& bot, BotSquad& squad, const Entity& pyro, EntityId pyro_id, ivec2 nearby_enemy_cell);
+int bot_squad_get_molotov_cell_score(const MatchState& state, const Entity& pyro, ivec2 cell);
+ivec2 bot_squad_find_best_molotov_cell(const MatchState& state, const Entity& pyro, ivec2 attack_point);
+MatchInput bot_squad_detective_micro(const MatchState& state, Bot& bot, BotSquad& squad, const Entity& detective, EntityId detective_id);
+MatchInput bot_squad_a_move_miners(const MatchState& state, const BotSquad& squad, const Entity& first_miner, EntityId first_miner_id, ivec2 nearby_enemy_cell);
+MatchInput bot_squad_move_distant_units_to_target(const MatchState& state, const BotSquad& squad, const EntityList& entity_list);
+MatchInput bot_squad_return_to_nearest_base(const MatchState& state, Bot& bot, BotSquad& squad);
+EntityId bot_squad_get_nearest_base_goldmine_id(const MatchState& state, const Bot& bot, const BotSquad& squad);
+
+EntityList bot_create_entity_list_from_entity_count(const MatchState& state, const Bot& bot, EntityCount entity_count);
+void bot_entity_list_filter(const MatchState& state, EntityList& entity_list, std::function<bool(const Entity& entity, EntityId entity_id)> filter);
+ivec2 bot_entity_list_get_center(const MatchState& state, const EntityList& entity_list);
+ivec2 bot_squad_choose_target_cell(const MatchState& state, const Bot& bot, BotSquadType type, const EntityList& entity_list);
+ivec2 bot_squad_get_landmine_target_cell(const MatchState& state, const Bot& bot, ivec2 pyro_cell);
+ivec2 bot_squad_get_attack_target_cell(const MatchState& state, const Bot& bot, const EntityList& entity_list);
+ivec2 bot_squad_get_defend_target_cell(const MatchState& state, const Bot& bot, const EntityList& entity_list);
+
+MatchInput bot_squad_landmines_micro(const MatchState& state, Bot& bot, const BotSquad& squad, uint32_t match_timer);
+
+// Scouting
+
+void bot_scout_gather_info(const MatchState& state, Bot& bot);
+void bot_clear_base_info(BotBaseInfo& info);
+void bot_update_base_info(const MatchState& state, Bot& bot);
+MatchInput bot_scout(const MatchState& state, Bot& bot, uint32_t match_timer);
+EntityList bot_determine_entities_to_scout(const MatchState& state, const Bot& bot);
+void bot_assume_entity_is_scouted(Bot& bot, EntityId entity_id);
+void bot_prune_entities_assumed_to_be_scouted_list(const MatchState& state, Bot& bot);
+void bot_release_scout(Bot& bot);
+bool bot_should_scout(const Bot& bot, uint32_t match_timer);
+
+// Entity Reservation
+
+bool bot_is_entity_reserved(const Bot& bot, EntityId entity_id);
+void bot_reserve_entity(Bot& bot, EntityId entity_id);
+void bot_release_entity(Bot& bot, EntityId entity_id);
+
+// Entity Type Util
+
+EntityType bot_get_building_which_trains(EntityType unit_type);
+EntityType bot_get_building_prereq(EntityType building_type);
+EntityType bot_get_building_which_researches(uint32_t upgrade);
+
+// Metrics
+
+EntityCount bot_count_in_progress_entities(const MatchState& state, const Bot& bot);
+EntityCount bot_count_unreserved_entities(const MatchState& state, const Bot& bot);
+EntityCount bot_count_unreserved_army(const MatchState& state, const Bot& bot);
+bool bot_is_entity_unreserved_army(const Bot& bot, const Entity& entity, EntityId entity_id);
+EntityCount bot_count_available_production_buildings(const MatchState& state, const Bot& bot);
+int bot_score_unreserved_army(const MatchState& state, const Bot& bot);
+int bot_score_allied_army(const MatchState& state, const Bot& bot);
+int bot_score_enemy_army(const MatchState& state, const Bot& bot);
+bool bot_is_entity_type_production_building(EntityType type);
+std::vector<EntityType> bot_entity_types_production_buildings();
+
+// Misc
+
+EntityId bot_find_threatened_in_progress_building(const MatchState& state, const Bot& bot);
+EntityId bot_find_building_in_need_of_repair(const MatchState& state, const Bot& bot);
+MatchInput bot_repair_building(const MatchState& state, const Bot& bot, EntityId building_id);
+MatchInput bot_rein_in_stray_units(const MatchState& state, const Bot& bot);
+MatchInput bot_update_building_rally_point(const MatchState& state, const Bot& bot, EntityId building_id);
+ivec2 bot_choose_building_rally_point(const MatchState& state, const Bot& bot, const Entity& building);
+bool bot_is_rally_cell_valid(const MatchState& state, ivec2 rally_cell, int rally_margin, Rect origin_rect);
+MatchInput bot_unload_unreserved_carriers(const MatchState& state, const Bot& bot);
+
+// Score Util
+
+int bot_score_entity(const MatchState& state, const Bot& bot, const Entity& entity);
+int bot_score_entity_list(const MatchState& state, const Bot& bot, const EntityList& entity_list);
+
+// Util
+
+bool bot_has_scouted_entity(const MatchState& state, const Bot& bot, const Entity& entity, EntityId entity_id, bool allow_assumed_scouts = true);
+EntityId bot_find_hall_surrounding_goldmine(const MatchState& state, const Bot& bot, const Entity& goldmine);
+bool bot_does_entity_surround_goldmine(const Entity& entity, ivec2 goldmine_cell);
+MatchInput bot_return_entity_to_nearest_hall(const MatchState& state, const Bot& bot, EntityId entity_id);
+MatchInput bot_unit_flee(const MatchState& state, const Bot& bot, EntityId entity_id);
+ivec2 bot_get_unoccupied_cell_near_goldmine(const MatchState& state, const Bot& bot, EntityId goldmine_id);
+uint32_t bot_get_index_of_squad_of_type(const Bot& bot, BotSquadType type);
+bool bot_has_squad_of_type(const Bot& bot, BotSquadType type);
+bool bot_has_desired_squad_of_type(const Bot& bot, BotSquadType type);
+bool bot_is_bandit_rushing(const Bot& bot);
+bool bot_is_area_safe(const MatchState& state, const Bot& bot, ivec2 cell);
+void bot_queue_set_building_rally_point(Bot& bot, EntityId building_id);
