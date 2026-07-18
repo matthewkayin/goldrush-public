@@ -36,10 +36,7 @@ void network_search_lobbies(const char* query);
 void network_open_lobby(const char* lobby_name, NetworkLobbyPrivacy privacy);
 void network_join_lobby(const NetworkConnectionInfo& connection_info);
 const char* network_get_lobby_name();
-
-#ifdef GOLD_STEAM
-void network_steam_accept_invite(CSteamID lobby_id);
-#endif
+void network_steam_accept_invite(uint64_t lobby_id);
 
 // Messages
 

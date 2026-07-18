@@ -5,6 +5,10 @@
 #include <ctime>
 #include <vector>
 
+#ifdef GOLD_STEAM
+    #include <steam/steam_api.h>
+#endif
+
 std::string filesystem_get_timestamp_str() {
     time_t _time = time(NULL);
     tm _tm = *localtime(&_time);
@@ -22,6 +26,14 @@ std::string filesystem_get_data_path() {
         SDL_free(pref_path);
         return path;
     #endif
+}
+
+std::string filesystem_get_saves_folder_path() {
+    std::string path = filesystem_get_data_path() + "saves/";
+    #ifdef GOLD_STEAM
+        path += std::to_string(SteamUser()->GetSteamID().ConvertToUint64()) + "/";
+    #endif
+    return path;
 }
 
 std::string filesystem_get_scenario_path() {

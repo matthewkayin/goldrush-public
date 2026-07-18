@@ -30,6 +30,7 @@ STATIC_ASSERT(sizeof(int) == sizeof(int32_t));
 #ifdef RELEASE_VERSION
     #define APP_VERSION RELEASE_VERSION
     #define GOLD_BUILD_TYPE_STR "Release"
+    #define GOLD_STEAM
 #else
     #define APP_VERSION "dev"
     #define GOLD_DEBUG
@@ -41,10 +42,10 @@ STATIC_ASSERT(sizeof(int) == sizeof(int32_t));
 
 // #define GOLD_SIMD_CHECKSUM_TEST
 
-// #define GOLD_STEAM
+#define GOLD_STEAM
 #ifdef GOLD_STEAM
-    // #define GOLD_STEAM_APP_ID 3774270U
-    #define GOLD_STEAM_APP_ID 3831190U
+    #define GOLD_STEAM_APP_ID 3774270U
+    // #define GOLD_STEAM_APP_ID 3831190U
 #endif
 
 #ifdef PLATFORM_WIN32

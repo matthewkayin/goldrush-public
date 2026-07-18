@@ -331,7 +331,7 @@ Scenario* scenario_open_file(const char* path) {
     // Load json file
     Json* scenario_json = json_read(path);
     if (scenario_json == NULL) {
-        log_error("Unable to open scenario json at path %s", path);
+        log_error("Failed to open scenario file %s", path);
         return NULL;
     }
 
@@ -486,7 +486,6 @@ Scenario* scenario_open_file(const char* path) {
                 uint32_t upgrade = 1U << upgrade_index;
                 *allowed_upgrades |= upgrade;
             } else {
-                log_warn("Allowed upgrade %s for player %u not recognized.", upgrade_str.c_str(), index);
                 continue;
             }
         }
@@ -503,7 +502,7 @@ Scenario* scenario_open_file(const char* path) {
             if (entity_type < ENTITY_TYPE_COUNT) {
                 allowed_entities[entity_type] = true;
             } else {
-                log_warn("Allowed entity %s for player %u not recognized.", entity_str, index);
+                log_warn("Alllowed entity %s for player %u not recognized.", entity_str, index);
                 continue;
             }
         }
@@ -564,7 +563,6 @@ Scenario* scenario_open_file(const char* path) {
         for (size_t squad_entities_index = 0; squad_entities_index < squad_entities_json->array.length; squad_entities_index++) {
             uint32_t entity_index = (uint32_t)json_array_get_number(squad_entities_json, squad_entities_index);
             if (entity_index >= scenario->entity_count) {
-                log_warn("Entity index %u for squad %u (%s) is out of range.", entity_index, squad_index, squad.name);
                 continue;
             }
             squad.entities[squad.entity_count] = entity_index;
@@ -625,7 +623,6 @@ Scenario* scenario_open_file(const char* path) {
 bool scenario_export(const Scenario* scenario, const char* full_path) {
     FILE* file = fopen(full_path, "wb");
     if (!file) {
-        log_error("Scenario export - failed to open %s for writing.", full_path);
         return false;
     }
 
@@ -756,16 +753,22 @@ Scenario* scenario_import(const char* path) {
     return scenario;
 }
 
-void scenario_export_all() {
+bool scenario_export_all() {
     const uint32_t scenario_count = 12;
     for (uint32_t index = 0; index < scenario_count; index++) {
         char scenario_path[256];
         sprintf(scenario_path, "../scenario/scenario%u/scenario%u.json", index + 1, index + 1);
         Scenario* scenario = scenario_open_file(scenario_path);
+        if (!scenario) {
+            return false;
+        }
         sprintf(scenario_path, "../scenario/scenario%u/scenario%u.scn", index + 1, index + 1);
-        scenario_export(scenario, scenario_path);
+        if (!scenario_export(scenario, scenario_path)) {
+            return false;
+        }
         scenario_free(scenario);
     }
 
-    log_info("Finished.");
+    log_info("Scenario export finished.");
+    return true;
 }

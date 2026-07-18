@@ -247,7 +247,10 @@ enum MatchEventType {
     MATCH_EVENT_RESEARCH_COMPLETE,
     MATCH_EVENT_STATUS,
     MATCH_EVENT_PLAYER_DEFEATED,
-    MATCH_EVENT_ENTITY_KILLED
+    MATCH_EVENT_ENTITY_KILLED,
+    MATCH_EVENT_BUILDING_CANCELLED,
+    MATCH_EVENT_UNIT_UNLOADED,
+    MATCH_EVENT_CELL_SET_ON_FIRE
 };
 
 struct MatchEventSound {
@@ -269,6 +272,7 @@ struct MatchEventAlert {
     uint8_t player_id;
     ivec2 cell;
     int cell_size;
+    EntityType entity_type;
 };
 
 struct MatchEventSelectionHandoff {
@@ -294,7 +298,20 @@ struct MatchEventPlayerDefeated {
 struct MatchEventEntityKilled {
     EntityId attacker_id;
     EntityId defender_id;
-    bool defender_was_in_progress_building;
+};
+
+struct MatchEventBuildingCancelled {
+    EntityId building_id;
+};
+
+struct MatchEventUnitUnloaded {
+    EntityId unit_id;
+};
+
+struct MatchEventCellSetOnFire {
+    ivec2 cell;
+    ivec2 source_cell;
+    uint8_t source_player_id;
 };
 
 struct MatchEvent {
@@ -307,6 +324,9 @@ struct MatchEvent {
         MatchEventStatus status;
         MatchEventPlayerDefeated player_defeated;
         MatchEventEntityKilled entity_killed;
+        MatchEventBuildingCancelled building_cancelled;
+        MatchEventUnitUnloaded unit_unloaded;
+        MatchEventCellSetOnFire cell_set_on_fire;
     };
 };
 
@@ -335,7 +355,8 @@ struct Particle {
 
 struct Fire {
     ivec2 cell;
-    ivec2 source;
+    ivec2 source_cell;
+    uint32_t source_player_id;
     uint32_t time_to_live;
     Animation animation;
 };
@@ -350,6 +371,7 @@ struct Projectile {
     ProjectileType type;
     fvec2 position;
     fvec2 target;
+    uint32_t source_player_id;
 };
 
 // Fog
@@ -428,12 +450,15 @@ EntityId match_get_nearest_builder(const MatchState& state, const std::vector<En
 // Event
 
 void match_event_play_sound(MatchState& state, SoundName sound, ivec2 position);
-void match_event_alert(MatchState& state, MatchAlertType type, uint8_t player_id, ivec2 cell, int cell_size);
+void match_event_alert(MatchState& state, MatchAlertType type, uint8_t player_id, ivec2 cell, int cell_size, EntityType entity_type = ENTITY_TYPE_COUNT);
 void match_event_research_complete(MatchState& state, uint8_t player_id, uint32_t upgrade);
 void match_event_selection_handoff(MatchState& state, uint8_t player_id, EntityId to_deselect, EntityId to_select);
 void match_event_show_status(MatchState& state, uint8_t player_id, const char* message);
 void match_event_player_defeated(MatchState& state, uint8_t player_id);
 void match_event_entity_killed(MatchState& state, EntityId attacker_id, EntityId defender_id);
+void match_event_building_cancelled(MatchState& state, EntityId building_id);
+void match_event_unit_unloaded(MatchState& state, EntityId unit_id);
+void match_event_cell_set_on_fire(MatchState& state, ivec2 cell, ivec2 source_cell, uint8_t source_player_id);
 
 // Fog
 
@@ -446,7 +471,7 @@ void match_fog_update(MatchState& state, uint8_t team, ivec2 cell, int cell_size
 
 bool match_is_cell_on_fire(const MatchState& state, ivec2 cell);
 bool match_is_cell_rect_on_fire(const MatchState& state, ivec2 cell, int cell_size);
-void match_set_cell_on_fire(MatchState& state, ivec2 cell, ivec2 source);
+void match_set_cell_on_fire(MatchState& state, ivec2 cell, ivec2 source_cell, uint32_t source_player_id);
 
 // Entity
 

@@ -2,6 +2,7 @@
 
 #include "network/types.h"
 #include "core/logger.h"
+#include <cstring>
 
 NetworkScannerLan::NetworkScannerLan() {
     scanner_socket = enet_socket_create(ENET_SOCKET_TYPE_DATAGRAM);

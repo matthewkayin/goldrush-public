@@ -8,6 +8,7 @@
 
 std::string filesystem_get_timestamp_str();
 std::string filesystem_get_data_path();
+std::string filesystem_get_saves_folder_path();
 std::string filesystem_get_scenario_path();
 void filesystem_create_required_folders();
 std::string filesystem_get_path_folder(const char* path);

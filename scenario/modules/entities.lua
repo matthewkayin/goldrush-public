@@ -234,6 +234,7 @@ const Entity* get_by_index(uint32_t entity_index);
 uint32_t get_count();
 EntityId get_id_of(uint32_t entity_index);
 uint32_t get_index_of(EntityId entity_id);
+bool is_visible_to_player(EntityId entity_id, uint8_t player_id);
 ]])
 
 local entities = ffi.C

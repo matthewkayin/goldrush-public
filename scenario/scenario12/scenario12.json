@@ -25653,7 +25653,7 @@
 			]
 		},
 		{
-			"name": "Prospectors",
+			"name": "Prospectors (Red)",
 			"team": 1,
 			"recolor_id": 1,
 			"starting_gold": 500,
@@ -25664,7 +25664,7 @@
 				"Is Omniscient"
 			],
 			"target_base_count": 3,
-			"macro_cycle_cooldown": 0,
+			"macro_cycle_cooldown": 7200,
 			"allowed_upgrades": [
 				"Wagon Armor",
 				"Land Mines",
@@ -25698,7 +25698,7 @@
 			]
 		},
 		{
-			"name": "Prospectors",
+			"name": "Prospectors (Purple)",
 			"team": 1,
 			"recolor_id": 3,
 			"starting_gold": 500,
@@ -25709,7 +25709,7 @@
 				"Is Omniscient"
 			],
 			"target_base_count": 3,
-			"macro_cycle_cooldown": 0,
+			"macro_cycle_cooldown": 7200,
 			"allowed_upgrades": [
 				"Wagon Armor",
 				"Land Mines",

@@ -2,6 +2,7 @@ local objectives = require("objectives")
 local actions = require("actions")
 local squad_util = require("squad_util")
 local entities = require("entities")
+local ivec2 = require("ivec2")
 
 local OBJECTIVE_DEFEAT_BANDITS = "Destroy the bandit's base"
 
@@ -10,6 +11,7 @@ local HARASS_INTERVAL = 2 * 60
 
 local is_match_over = false
 local should_harass = false
+local has_sent_bunker_hint = false
 local next_harass_time
 
 function scenario_init()
@@ -17,9 +19,9 @@ function scenario_init()
         actions.wait(1)
 
         scenario.chat("Scouts report that there's a bandit camp to the north.")
-        actions.wait(2)
+        actions.wait(4)
         scenario.chat("The sheriff wants you to take them out.")
-        actions.wait(2)
+        actions.wait(4)
 
         objectives.announce_new_objective(OBJECTIVE_DEFEAT_BANDITS)
         objectives.add_objective({
@@ -37,14 +39,15 @@ function scenario_init()
         actions.wait(2 * 60)
 
         local goldmine = entities.get_by_id(scenario.constants.UNCLAIMED_GOLDMINE)
+        local goldmine_cell = ivec2.from_cdata(goldmine.cell)
         scenario.fog_reveal({
-            cell = goldmine.cell,
+            cell = goldmine_cell,
             cell_size = 3,
             sight = 4,
             duration = 5
         })
         scenario.highlight_entity(scenario.constants.UNCLAIMED_GOLDMINE)
-        scenario.create_alert(scenario.ALERT_COLOR_GOLD, goldmine.cell, 3)
+        scenario.create_alert(scenario.ALERT_COLOR_GOLD, goldmine_cell, 3)
         scenario.chat("Looks like there's an unclaimed gold mine out there.")
 
         should_harass = true
@@ -63,6 +66,15 @@ function scenario_update()
             scenario.set_match_over_victory()
         end)
         is_match_over = true
+    end
+
+    -- Bunker hint
+    if not has_sent_bunker_hint and scenario.get_player_entity_count(scenario.PLAYER_ID, scenario.entity_type.BUNKER) > 0 then
+        has_sent_bunker_hint = true
+        actions.run(function ()
+            actions.wait(1.0)
+            scenario.hint("Garrison your cowboys inside the bunker.")
+        end)
     end
 
     if should_harass and scenario.get_time() >= next_harass_time then

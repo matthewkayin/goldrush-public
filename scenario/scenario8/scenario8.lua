@@ -29,6 +29,15 @@ function scenario_init()
     scenario.grant_player_upgrade(ENEMY_PLAYER_ID, scenario.upgrade.IRON_SIGHTS)
     scenario.grant_player_upgrade(ENEMY_PLAYER_ID, scenario.upgrade.BAYONETS)
 
+    scenario.queue_match_input({
+        player_id = ENEMY_PLAYER_ID,
+        type = scenario.match_input_type.DEFEND,
+        entity_ids = scenario.constants.B3_CANNONS
+    })
+    for index = 1,#scenario.constants.B3_CANNONS do
+        scenario.bot_reserve_entity(ENEMY_PLAYER_ID, scenario.constants.B3_CANNONS[index])
+    end
+
     scenario.hold_camera()
 
     actions.run(function ()
@@ -129,11 +138,6 @@ function scenario_init()
             type = scenario.match_input_type.MOVE_ENTITY,
             target_id = scenario.constants.HARASS_GOLDMINE,
             entity_ids = scenario.constants.H1_MINERS,
-        })
-        scenario.queue_match_input({
-            player_id = ENEMY_PLAYER_ID,
-            type = scenario.match_input_type.DEFEND,
-            entity_ids = scenario.constants.B3_CANNONS
         })
     end)
 end

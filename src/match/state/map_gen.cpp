@@ -855,16 +855,8 @@ bool map_tile_is_south_wall(SpriteName sprite) {
 }
 
 bool raw_map_can_stair_be_placed_at_cell(const RawMap* raw_map, ivec2 cell) {
-    const bool debug_log = cell == ivec2(121, 106) || cell == ivec2(121, 107);
-    if (debug_log) {
-        log_debug("considering <%i, %i>", cell.x, cell.y);
-    }
-
     const int cell_index = cell.x + (cell.y * raw_map->width);
     if (!(raw_map->data[cell_index] == MAP_VALUE_HIGHGROUND || raw_map->data[cell_index] == MAP_VALUE_STAIR)) {
-        if (debug_log) {
-            log_debug("is not highground");
-        }
         return false;
     }
 
@@ -879,10 +871,6 @@ bool raw_map_can_stair_be_placed_at_cell(const RawMap* raw_map, ivec2 cell) {
         if (!(raw_map->data[neighbor_index] == MAP_VALUE_HIGHGROUND || raw_map->data[neighbor_index] == MAP_VALUE_STAIR)) {
             lowground_neighbors += DIRECTION_MASK[direction];
         }
-    }
-
-    if (debug_log) {
-        log_debug("lowground neighbors %u", lowground_neighbors);
     }
 
     /*

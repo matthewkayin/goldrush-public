@@ -294,7 +294,7 @@ int script_set_match_over_victory(lua_State* lua_state) {
         return 0;
     }
 
-    shell->mode = MATCH_SHELL_MODE_SCENARIO_VICTORY;
+    match_shell_set_match_over_victory(shell);
 
     return 0;
 }
@@ -311,7 +311,7 @@ int script_set_match_over_defeat(lua_State* lua_state) {
         return 0;
     }
 
-    shell->mode = MATCH_SHELL_MODE_SCENARIO_DEFEAT;
+    match_shell_set_match_over_defeat(shell);
 
     return 0;
 }

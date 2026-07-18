@@ -2,7 +2,6 @@ local actions = require("actions")
 local objectives = require("objectives")
 local entities = require("entities")
 local entity_util = require("entity_util")
-local squad_util = require("squad_util")
 local ivec2 = require("ivec2")
 
 local ENEMY_PLAYER_ID = 1
@@ -18,7 +17,6 @@ function scenario_init()
     local crates = entity_util.find_entities(function (entity)
         return entity.type == scenario.entity_type.CRATE
     end)
-    scenario.log("Crate total", #crates)
     crates_total = #crates
 
     actions.run(intro_cutscene)
@@ -151,6 +149,9 @@ function enemy_miner_defense_update()
                 goto entity_continue
             end
             if ivec2.manhattan_distance(entity.cell, miner.cell) > 16 then
+                goto entity_continue
+            end
+            if not entities.is_visible_to_player(entities.get_id_of(entity_index), ENEMY_PLAYER_ID) then
                 goto entity_continue
             end
 

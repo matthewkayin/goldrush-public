@@ -21,20 +21,21 @@ int WINAPI WinMain(HINSTANCE /*h_instance*/, HINSTANCE /*h_prev_instance*/, LPST
     while (command_line[command_line_index] != '\0') {
         if (command_line[command_line_index] == '"') {
             is_in_quotes = !is_in_quotes;
+        } else if (command_line[command_line_index] == ' ' && !is_in_quotes) {
+            arg_buffer[argc][argv_index] = '\0';
+            argv[argc] = arg_buffer[argc];
+            argc++;
+            argv_index = 0;
         } else {
             arg_buffer[argc][argv_index] = command_line[command_line_index];
             argv_index++;
         }
         command_line_index++;
-
-        if ((command_line[command_line_index] == ' ' && !is_in_quotes) || command_line[command_line_index] == '\0') {
-            command_line_index++;
-            arg_buffer[argc][argv_index] = '\0';
-            argv[argc] = arg_buffer[argc];
-            argc++;
-            argv_index = 0;
-        }
     }
+
+    arg_buffer[argc][argv_index] = '\0';
+    argv[argc] = arg_buffer[argc];
+    argc++;
 
     return gold_main(argc, argv);
 }

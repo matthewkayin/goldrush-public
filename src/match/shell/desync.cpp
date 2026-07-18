@@ -18,7 +18,7 @@ STATIC_ASSERT(sizeof(RememberedEntity) == 24ULL);
 STATIC_ASSERT(sizeof(Entity) == 228ULL);
 STATIC_ASSERT(sizeof(BuildingQueueItem) == 8ULL);
 STATIC_ASSERT(sizeof(Particle) == 44ULL);
-STATIC_ASSERT(sizeof(Projectile) == 20ULL);
+STATIC_ASSERT(sizeof(Projectile) == 24ULL);
 STATIC_ASSERT(sizeof(Target) == 36ULL);
 STATIC_ASSERT(sizeof(FogReveal) == 24ULL);
 STATIC_ASSERT(sizeof(MatchPlayer) == 56ULL);
@@ -27,7 +27,7 @@ STATIC_ASSERT(sizeof(EntityCount) == 96ULL);
 STATIC_ASSERT(sizeof(BotSquadType) == 4ULL);
 STATIC_ASSERT(sizeof(BotDesiredSquad) == 100ULL);
 STATIC_ASSERT(sizeof(BotBaseInfo) == 220);
-STATIC_ASSERT(sizeof(MatchState) == 2482500ULL);
+STATIC_ASSERT(sizeof(MatchState) == 2483652ULL);
 STATIC_ASSERT(sizeof(Bot) == 16244ULL);
 
 #ifdef GOLD_DEBUG
@@ -432,7 +432,8 @@ void desync_compare_frames(uint8_t* state_buffer_a, uint8_t* state_buffer_b) {
             const Fire& fire_b = state_b->fires.data[index];
 
             GOLD_ASSERT(fire_a.cell == fire_b.cell);
-            GOLD_ASSERT(fire_a.source == fire_b.source);
+            GOLD_ASSERT(fire_a.source_cell == fire_b.source_cell);
+            GOLD_ASSERT(fire_a.source_player_id == fire_b.source_player_id);
             GOLD_ASSERT(fire_a.time_to_live == fire_b.time_to_live);
             desync_assert_animations_equal(fire_a.animation, fire_b.animation);
 
@@ -568,10 +569,9 @@ void desync_compare_frames(uint8_t* state_buffer_a, uint8_t* state_buffer_b) {
     }
 }
 
-
 #else
 
-desync_init(const char* desync_foldername) { return true; }
+bool desync_init(const char* desync_foldername) { return true; }
 void desync_quit() {}
 
 uint32_t desync_get_checksum_frequency() {

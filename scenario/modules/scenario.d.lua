@@ -108,7 +108,9 @@ scenario.bot_squad_type.PATROL = 5
 
 scenario.music = {}
 scenario.music.MATCH1 = 233
+scenario.music.MATCH4 = 236
 scenario.music.MATCH2 = 234
+scenario.music.MATCH3 = 235
 
 scenario.bot_config_flag = {}
 scenario.bot_config_flag.SHOULD_SURRENDER = 32
@@ -164,8 +166,10 @@ scenario.sound.SWORD = 8
 scenario.sound.MINE_PRIME = 15
 scenario.sound.CANNON = 10
 scenario.sound.PEN_SCRATCH = 36
+scenario.sound.STINGER_DEFEAT = 38
 scenario.sound.ALERT_BELL = 20
 scenario.sound.MUSKET = 2
+scenario.sound.STINGER_VICTORY = 37
 scenario.sound.DEATH = 1
 scenario.sound.MINE_DESTROY = 13
 scenario.sound.MATCH_START = 33

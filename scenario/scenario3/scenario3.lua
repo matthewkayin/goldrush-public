@@ -3,6 +3,7 @@ local objectives = require("objectives")
 local squad_util = require("squad_util")
 local entity_util = require("entity_util")
 local entities = require("entities")
+local ivec2 = require("ivec2")
 
 local OBJECTIVE_MINE_GOLD = "Mine 5000 gold before your opponent"
 
@@ -294,7 +295,7 @@ function builder_state_update(builder_state)
             scenario.entity_type.COWBOY,
             scenario.entity_type.COWBOY
         }
-        local entity_cells = scenario.find_entity_spawn_cells(bunker.cell, entity_types)
+        local entity_cells = scenario.find_entity_spawn_cells(ivec2.from_cdata(bunker.cell), entity_types)
 
         -- Build squad entity IDs list
         local squad_entity_ids = {}
@@ -313,7 +314,7 @@ function builder_state_update(builder_state)
         scenario.bot_add_squad({
             player_id = ENEMY_PLAYER_ID,
             type = scenario.bot_squad_type.DEFEND,
-            target_cell = builder.cell,
+            target_cell = ivec2.from_cdata(builder.cell),
             entity_list = squad_entity_ids
         })
 
@@ -340,7 +341,7 @@ function harass_goldmine(params)
     squad_util.spawn_harass_squad({
         player_id = ENEMY_PLAYER_ID,
         spawn_cell = params.spawn_cell,
-        target_cell = goldmine.cell,
+        target_cell = ivec2.from_cdata(goldmine.cell),
         entity_types = {
             scenario.entity_type.BANDIT,
             scenario.entity_type.BANDIT,

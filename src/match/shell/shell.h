@@ -12,6 +12,7 @@
 #include "render/ysort.h"
 #include "network/types.h"
 #include "match/scenario/scenario.h"
+#include "match/shell/achievements.h"
 #include <luajit/lua.hpp>
 #include <vector>
 #include <queue>
@@ -106,7 +107,7 @@ const uint32_t REPLAY_FOG_NONE = 0U;
 const uint32_t REPLAY_FOG_EVERYONE = 1U;
 
 // Music
-const uint32_t MATCH_SHELL_MUSIC_TRACK_COUNT = 2U;
+const uint32_t MATCH_SHELL_MUSIC_TRACK_COUNT = 5U;
 
 enum MatchShellMode {
     MATCH_SHELL_MODE_NOT_STARTED,
@@ -403,6 +404,9 @@ struct MatchShell {
     uint32_t next_checksum_frame;
     std::queue<uint32_t> checksums[MAX_PLAYERS];
 
+    // Achievements
+    AchievementsTracker achievements_tracker;
+
     // Debug
     MatchShellFogLevel debug_fog_level;
     bool debug_show_region_lines;
@@ -432,6 +436,8 @@ bool match_shell_does_player_meet_hotkey_requirements(const MatchState& state, I
 bool match_shell_is_hotkey_available(const MatchShell* shell, const HotkeyButtonInfo& info);
 uint32_t match_shell_get_player_entity_count(const MatchShell* shell, uint8_t player_id, EntityType entity_type);
 uint32_t match_shell_update_displayed_gold_amount(uint32_t current_displayed_value, uint32_t current_actual_value);
+void match_shell_set_match_over_victory(MatchShell* shell);
+void match_shell_set_match_over_defeat(MatchShell* shell);
 void match_shell_leave_match(MatchShell* shell, MatchShellMode mode);
 
 // State queries

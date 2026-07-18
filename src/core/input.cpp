@@ -62,15 +62,7 @@ void input_save_hotkey_mapping() {
     }
 }
 
-void input_load_hotkey_mapping() {
-    std::string hotkey_path = filesystem_get_data_path() + "hotkeys.json";
-    Json* hotkey_json = json_read(hotkey_path.c_str());
-    if (!hotkey_json) {
-        log_info("hotkeys.json does not exist. Saving defaults.");
-        input_save_hotkey_mapping();
-        return;
-    }
-
+void input_set_hotkey_mapping_from_json(Json* hotkey_json) {
     for (size_t index = 0; index < hotkey_json->object.length; index++) {
         const char* key = hotkey_json->object.keys[index];
         int hotkey;
@@ -92,12 +84,37 @@ void input_load_hotkey_mapping() {
 
         input_set_hotkey_mapping((InputHotkey)hotkey, value);
     }
+}
 
-    log_info("Loaded hotkey mapping.");
+void input_load_hotkey_mapping() {
+    // Check in saves folder
+    std::string hotkey_path = input_get_saved_hotkeys_path();
+    Json* hotkey_json = json_read(hotkey_path.c_str());
+    if (hotkey_json) {
+        input_set_hotkey_mapping_from_json(hotkey_json);
+        log_info("Loaded hotkey mapping from saves folder.");
+        json_free(hotkey_json);
+        return;
+    }
+
+    // If that didn't work, check the old path
+    hotkey_path = filesystem_get_data_path() + "hotkeys.json";
+    hotkey_json = json_read(hotkey_path.c_str());
+    if (hotkey_json) {
+        input_set_hotkey_mapping_from_json(hotkey_json);
+        input_save_hotkey_mapping();
+        log_info("Loaded hotkey mapping from old path. Saved to saves folder.");
+        json_free(hotkey_json);
+        return;
+    }
+
+    // If not found in either path, save defaults
+    input_save_hotkey_mapping();
+    log_info("hotkeys.json does not exist. Saved defaults.");
 }
 
 const std::string input_get_saved_hotkeys_path() {
-    return filesystem_get_data_path() + "hotkeys.json";
+    return filesystem_get_saves_folder_path() + "hotkeys.json";
 }
 
 const char* input_get_hotkey_str(InputHotkey hotkey) {

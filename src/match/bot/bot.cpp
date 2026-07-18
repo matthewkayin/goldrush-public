@@ -1255,6 +1255,11 @@ MatchInput bot_build_building(const MatchState& state, Bot& bot, EntityType buil
         return (MatchInput) { .type = MATCH_INPUT_NONE };
     }
 
+    // Check if building location is safe
+    if (bot_is_area_dangerous_for_in_progress_building(state, bot, building_type, building_location, 0)) {
+        return (MatchInput) { .type = MATCH_INPUT_NONE };
+    }
+
     log_debug("BOT %u get_production_input, build building type %s location <%i, %i>.", bot.player_id, entity_get_data(building_type).name, building_location.x, building_location.y);
     MatchInput input;
     input.type = MATCH_INPUT_BUILD;
@@ -2769,6 +2774,7 @@ MatchInput bot_squad_a_move_miners(const MatchState& state, const BotSquad& squa
         }
     }
 
+    log_debug("BOT - a move miners");
     return input;
 }
 
@@ -3262,7 +3268,6 @@ void bot_clear_base_info(BotBaseInfo& info) {
 }
 
 void bot_update_base_info(const MatchState& state, Bot& bot) {
-
     // Populate the base_info list and figure out who controls each goldmine
     for (uint32_t base_info_index = 0; base_info_index < bot.base_info.size(); base_info_index++) {
         BotBaseInfo& base_info = bot.base_info[base_info_index];
@@ -3900,36 +3905,7 @@ EntityId bot_find_threatened_in_progress_building(const MatchState& state, const
             return false;
         }
 
-        int nearby_ally_score = 0;
-        int nearby_enemy_score = 0;
-        for (uint32_t entity_index = 0; entity_index < state.entities.size(); entity_index++) {
-            const Entity& entity = state.entities[entity_index];
-            if (entity.health == 0 ||
-                    ivec2::manhattan_distance(entity.cell, building.cell) > BOT_NEAR_DISTANCE ||
-                    !entity_is_visible_to_player(state, entity, bot.player_id)) {
-                continue;
-            }
-
-            if (state.players[entity.player_id].team == state.players[bot.player_id].team) {
-                nearby_ally_score += bot_score_entity(state, bot, entity);
-            } else {
-                nearby_enemy_score += bot_score_entity(state, bot, entity);
-            }
-        }
-
-        if (nearby_enemy_score < BOT_UNIT_SCORE) {
-            return false;
-        }
-        if (building.health > 100 && nearby_enemy_score < 3 * BOT_UNIT_SCORE) {
-            return false;
-        }
-        if (building.health > entity_get_data(building.type).max_health / 4 &&
-                nearby_ally_score > nearby_enemy_score) {
-            return false;
-        }
-
-        log_debug("BOT %u find_threatened_in_progress_building ally score %u enemy score %u", nearby_ally_score, nearby_enemy_score);
-        return true;
+        return bot_is_area_dangerous_for_in_progress_building(state, bot, building.type, building.cell, building.health);
     });
 }
 
@@ -4472,4 +4448,38 @@ void bot_queue_set_building_rally_point(Bot& bot, EntityId building_id) {
     }
 
     bot.buildings_to_set_rally_points.push(building_id);
+}
+
+bool bot_is_area_dangerous_for_in_progress_building(const MatchState& state, const Bot& bot, EntityType building_type, ivec2 building_cell, int building_health) {
+    int nearby_ally_score = 0;
+    int nearby_enemy_score = 0;
+
+    for (uint32_t entity_index = 0; entity_index < state.entities.size(); entity_index++) {
+        const Entity& entity = state.entities[entity_index];
+        if (entity.health == 0 ||
+                ivec2::manhattan_distance(entity.cell, building_cell) > BOT_NEAR_DISTANCE ||
+                !entity_is_visible_to_player(state, entity, bot.player_id)) {
+            continue;
+        }
+
+        if (state.players[entity.player_id].team == state.players[bot.player_id].team) {
+            nearby_ally_score += bot_score_entity(state, bot, entity);
+        } else {
+            nearby_enemy_score += bot_score_entity(state, bot, entity);
+        }
+    }
+
+    if (nearby_enemy_score < BOT_UNIT_SCORE) {
+        return false;
+    }
+    if (building_health > 100 && nearby_enemy_score < 3 * BOT_UNIT_SCORE) {
+        return false;
+    }
+    if (building_health > entity_get_data(building_type).max_health / 4 &&
+            nearby_ally_score > nearby_enemy_score) {
+        return false;
+    }
+
+    log_debug("BOT %u area is dangerous from in progress building. ally score %u enemy score %u", nearby_ally_score, nearby_enemy_score);
+    return true;
 }

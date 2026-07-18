@@ -1,7 +1,5 @@
 #include "adler32.h"
 
-#include "defines.h"
-
 #define MOD_ADLER 65521U
 #define NMAX 5552
 

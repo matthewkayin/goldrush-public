@@ -471,7 +471,7 @@ bool menu_is_in_submenu(const MenuState* state) {
 
 #ifdef GOLD_STEAM
 
-void menu_prompt_username(MenuState* state) {}
+void menu_prompt_username(MenuState* /*state*/) {}
 
 void menu_ui_profile_button(MenuState* /*state*/) {}
 
@@ -485,7 +485,7 @@ void menu_set_mode_lobbylist_steam(MenuState* state) {
 
 void menu_add_lobby_creation_chat_message(MenuState* state) {
     if (network_is_host() && network_get_backend() == NETWORK_BACKEND_STEAM) {
-        menu_add_chat_message(state, "You have created a lobby. You can invite your friends using the Steam overlay (SHIFT+TAB).");
+        menu_lobby_add_chat_message(state, "You have created a lobby. You can invite your friends using the Steam overlay (SHIFT+TAB).");
     }
 }
 

@@ -119,6 +119,7 @@ void match_shell_menu_update(MatchShell* shell) {
                 : "Defeat!";
             match_shell_begin_menu(shell, header_text, 3);
                 if (ui_button(shell->ui_context, "Keep Playing", button_size, true)) {
+                    sound_resume_music();
                     shell->mode = MATCH_SHELL_MODE_NONE;
                 }
                 if (ui_button(shell->ui_context, "Return to Menu", button_size, true)) {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/resource.h"
+#include "core/resource_list.h"
 #include <cstdint>
 
 #define SOUND_NOT_PLAYING UINT32_MAX
@@ -43,6 +43,8 @@ enum SoundName {
     SOUND_GOLD_PICKUP,
     SOUND_AVALANCHE,
     SOUND_PEN_SCRATCH,
+    SOUND_STINGER_VICTORY,
+    SOUND_STINGER_DEFEAT,
     SOUND_COUNT
 };
 
@@ -55,9 +57,12 @@ const char* sound_get_name(SoundName sound);
 void sound_set_sfx_volume(uint32_t volume);
 void sound_set_music_volume(uint32_t volume);
 
+void sound_update();
 uint32_t sound_play(SoundName sound, bool looping = false);
 void sound_play_music(ResourceName music_resource, uint32_t options);
 bool sound_is_music_playing();
 void sound_stop(uint32_t track_index);
 void sound_stop_music();
+void sound_pause_music();
+void sound_resume_music();
 void sound_stop_all();

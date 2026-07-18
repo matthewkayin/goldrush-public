@@ -2,6 +2,7 @@
 
 #include "core/logger.h"
 #include "network/network.h"
+#include <cstring>
 
 NetworkHostLan::NetworkHostLan() {
     memset(host_lobby_name, 0, sizeof(host_lobby_name));
@@ -37,7 +38,7 @@ NetworkHostLan::~NetworkHostLan() {
         enet_socket_shutdown(host_listener_socket, ENET_SOCKET_SHUTDOWN_READ_WRITE);
         enet_socket_destroy(host_listener_socket);
     }
-    
+
     log_info("Destroyed LAN host.");
 }
 

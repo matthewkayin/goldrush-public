@@ -2,6 +2,7 @@ local actions = require("actions")
 local objectives = require("objectives")
 local ivec2 = require("ivec2")
 local entities = require("entities")
+local entity_util = require("entity_util")
 
 local OBJECTIVE_DEFEAT_PYRO = "Stop the enemy pyro"
 local ENEMY_PLAYER_ID = 1
@@ -9,6 +10,8 @@ local AVALANCHE_COUNTDOWN_DURATION = 15 * 60
 
 local is_match_over = false
 local avalanche_time = nil
+local ambush_squads = {}
+local has_ambushed = false
 
 function scenario_init()
     scenario.bot_reserve_entity(ENEMY_PLAYER_ID, scenario.constants.TNT_PYRO)
@@ -19,6 +22,7 @@ function scenario_init()
     })
     scenario.grant_player_upgrade(ENEMY_PLAYER_ID, scenario.upgrade.BAYONETS)
     scenario.grant_player_upgrade(ENEMY_PLAYER_ID, scenario.upgrade.GETAWAY_BOOTS)
+    ambush_init()
     actions.run(intro_cutscene)
 end
 
@@ -50,6 +54,8 @@ function scenario_update()
             scenario.set_match_over_victory()
         end)
     end
+
+    ambush_update()
 
     actions.update()
 end
@@ -174,4 +180,38 @@ function avalanche_cutscene()
         coroutine.yield()
     until scenario.get_camera_mode() == scenario.CAMERA_MODE_FREE
     scenario.begin_camera_shake(1)
+end
+
+function ambush_init()
+    for index = 1,#scenario.constants.AMBUSH_UNITS do
+        local squad_id = scenario.bot_get_entity_squad_id(scenario.constants.AMBUSH_UNITS[index])
+        table.insert(ambush_squads, squad_id)
+    end
+end
+
+function ambush_update()
+    if not has_ambushed and entity_util.player_has_entity_near_cell(scenario.PLAYER_ID, scenario.constants.AMBUSH_CELL, 8) then
+        has_ambushed = true
+        for index = 1,#ambush_squads do
+            local squad_id = ambush_squads[index]
+            if not scenario.bot_squad_exists(ENEMY_PLAYER_ID, squad_id) then
+                goto continue
+            end
+
+            local squad_info = scenario.bot_get_squad_by_id(ENEMY_PLAYER_ID, squad_id)
+            if entity_util.player_has_entity_near_cell(scenario.PLAYER_ID, squad_info.target_cell, 8) then
+                goto continue
+            end
+
+            scenario.bot_set_squad_target_cell(ENEMY_PLAYER_ID, squad_id, scenario.constants.AMBUSH_CELL)
+            scenario.queue_match_input({
+                player_id = ENEMY_PLAYER_ID,
+                type = scenario.match_input_type.MOVE_ATTACK_CELL,
+                target_cell = scenario.constants.AMBUSH_CELL,
+                entity_ids = squad_info.entity_list
+            })
+
+            ::continue::
+        end
+    end
 end

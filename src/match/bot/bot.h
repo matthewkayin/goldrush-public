@@ -274,3 +274,4 @@ bool bot_has_desired_squad_of_type(const Bot& bot, BotSquadType type);
 bool bot_is_bandit_rushing(const Bot& bot);
 bool bot_is_area_safe(const MatchState& state, const Bot& bot, ivec2 cell);
 void bot_queue_set_building_rally_point(Bot& bot, EntityId building_id);
+bool bot_is_area_dangerous_for_in_progress_building(const MatchState& state, const Bot& bot, EntityType building_type, ivec2 building_cell, int building_health);

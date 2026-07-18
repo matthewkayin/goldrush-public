@@ -1,5 +1,4 @@
 {
-	"script": "scenario11.lua",
 	"map_type": "Klondike",
 	"map_bake_lcg_seed": 41,
 	"map": {
@@ -12412,7 +12411,7 @@
 			2,
 			2,
 			2,
-			2,
+			7,
 			2,
 			2,
 			2,
@@ -12438,6 +12437,54 @@
 			1,
 			1,
 			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			6,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			1,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
+			2,
 			1,
 			1,
 			1,
@@ -12467,54 +12514,6 @@
 			1,
 			1,
 			1,
-			1,
-			1,
-			1,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			2,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
-			6,
-			1,
-			1,
-			1,
-			1,
-			1,
-			1,
 			2,
 			2,
 			2,
@@ -12573,7 +12572,7 @@
 			2,
 			2,
 			2,
-			2,
+			7,
 			2,
 			2,
 			2,
@@ -13053,7 +13052,7 @@
 			2,
 			2,
 			2,
-			7,
+			2,
 			2,
 			2,
 			2,
@@ -13214,7 +13213,7 @@
 			2,
 			2,
 			2,
-			7,
+			2,
 			2,
 			2,
 			2,
@@ -13373,7 +13372,7 @@
 			2,
 			2,
 			2,
-			7,
+			2,
 			2,
 			2,
 			2,
@@ -13534,7 +13533,7 @@
 			2,
 			2,
 			2,
-			7,
+			2,
 			2,
 			2,
 			2,
@@ -25617,7 +25616,7 @@
 			"name": "Player",
 			"team": 0,
 			"recolor_id": 0,
-			"starting_gold": 50,
+			"starting_gold": 650,
 			"allowed_upgrades": [
 				"Wagon Armor",
 				"Land Mines",
@@ -25786,23 +25785,23 @@
 			}
 		},
 		{
-			"type": "House",
-			"player_id": 0,
+			"type": "Balloon",
+			"player_id": 1,
 			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
-				"x": 142,
-				"y": 112
+				"x": 51,
+				"y": 40
 			}
 		},
 		{
-			"type": "House",
-			"player_id": 0,
+			"type": "Soldier",
+			"player_id": 1,
 			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
-				"x": 146,
-				"y": 117
+				"x": 119,
+				"y": 30
 			}
 		},
 		{
@@ -27686,163 +27685,13 @@
 			}
 		},
 		{
-			"type": "Soldier",
-			"player_id": 1,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 119,
-				"y": 30
-			}
-		},
-		{
 			"type": "Balloon",
-			"player_id": 1,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 51,
-				"y": 40
-			}
-		},
-		{
-			"type": "Barracks",
 			"player_id": 0,
 			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
-				"x": 153,
-				"y": 112
-			}
-		},
-		{
-			"type": "Workshop",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 145,
-				"y": 113
-			}
-		},
-		{
-			"type": "Cannoneer",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 134,
-				"y": 110
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 137,
-				"y": 118
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 132,
-				"y": 110
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 133,
+				"x": 140,
 				"y": 111
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 133,
-				"y": 113
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 132,
-				"y": 112
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 138,
-				"y": 119
-			}
-		},
-		{
-			"type": "Balloon",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 135,
-				"y": 113
-			}
-		},
-		{
-			"type": "Cannoneer",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 139,
-				"y": 114
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 137,
-				"y": 116
-			}
-		},
-		{
-			"type": "Soldier",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 138,
-				"y": 117
-			}
-		},
-		{
-			"type": "Wagon",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 146,
-				"y": 122
 			}
 		}
 	],
@@ -27942,7 +27791,7 @@
 			"player_id": 1,
 			"type": "Defend",
 			"entities": [
-				200
+				9
 			]
 		},
 		{
@@ -28091,7 +27940,7 @@
 			"entities": [
 				28,
 				198,
-				199,
+				10,
 				196,
 				197
 			]
@@ -28217,6 +28066,25 @@
 				"x": 150,
 				"y": 107
 			}
+		},
+		{
+			"name": "AMBUSH_CELL",
+			"type": "Cell",
+			"cell": {
+				"x": 40,
+				"y": 50
+			}
+		},
+		{
+			"name": "AMBUSH_UNITS",
+			"type": "Entity List",
+			"entity_list": [
+				68,
+				80,
+				72,
+				77,
+				82
+			]
 		}
 	]
 }

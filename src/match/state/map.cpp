@@ -46,21 +46,6 @@ void map_init(Map& map, MapType map_type, const RawMap* raw_map, int* lcg_seed) 
     map_calculate_unreachable_cells(map);
     map_init_regions(map);
 
-    for (uint32_t region = 0; region < map.region_count; region++) {
-        char connected_regions[128];
-        char* str_ptr = connected_regions;
-        for (uint32_t other_region = 0; other_region < map.region_count; other_region++) {
-            if (region == other_region) {
-                continue;
-            }
-            if (!map_are_regions_connected(map, region, other_region)) {
-                continue;
-            }
-            str_ptr += sprintf(str_ptr, "%u, ", other_region);
-        }
-        log_debug("Region %u is connected to %s", region, connected_regions);
-    }
-
     log_info("Initialized map. Type %u Size %ux%u.", map_type, map.width, map.height);
 }
 

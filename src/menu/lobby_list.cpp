@@ -109,13 +109,13 @@ void menu_ui_lobby_privacy(MenuState* state) {
     }
     const SpriteInfo& dropdown_info = render_get_sprite_info(SPRITE_UI_DROPDOWN);
 
-    ui_begin_row(state->ui, ivec2(0, 0), 0);
-        ui_element_position(state->ui, ivec2(0, 3));
-        ui_text(state->ui, FONT_WESTERN8_GOLD, "Privacy:");
+    ui_begin_row(state->ui_context, ivec2(0, 0), 0);
+        ui_element_position(state->ui_context, ivec2(0, 3));
+        ui_text(state->ui_context, FONT_WESTERN8_GOLD, "Privacy:");
 
-        ui_element_position(state->ui, ivec2(LOBBY_CREATE_RECT.w - 16 - dropdown_info.frame_width, 0));
-        ui_dropdown(state->ui, UI_DROPDOWN, &state->lobby_privacy, LOBBY_TYPE_STRS, false);
-    ui_end_container(state->ui);
+        ui_element_position(state->ui_context, ivec2(LOBBY_CREATE_RECT.w - 16 - dropdown_info.frame_width, 0));
+        ui_dropdown(state->ui_context, UI_DROPDOWN, &state->lobby_privacy, LOBBY_TYPE_STRS, false);
+    ui_end_container(state->ui_context);
 }
 
 #else

@@ -10,7 +10,7 @@ void menu_credits_init(MenuState* state) {
     state->credits_yoffset = SCREEN_HEIGHT;
     state->credits_timer = CREDITS_TICK_DURATION;
 
-    void* credits_resource = resource_load(RESOURCE_CREDITS);
+    void* credits_resource = resource_load(RESOURCE_CREDITS, NULL, true);
     char* credits_resource_ptr = (char*)credits_resource;
 
     state->credits_entries.clear();

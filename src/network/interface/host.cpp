@@ -1,5 +1,7 @@
 #include "host.h"
 
+#include <cstring>
+
 bool INetworkHost::poll_events(NetworkHostEvent* event) {
     if (host_events.empty()) {
         return false;

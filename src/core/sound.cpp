@@ -5,17 +5,19 @@
 #include "SDL3/SDL_properties.h"
 #include "core/logger.h"
 #include "core/asserts.h"
-#include "core/filesystem.h"
 #include "core/options.h"
 #include "core/resource.h"
 #include "util/bitflag.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_mixer.h>
 #include <unordered_map>
+#include <cstdlib>
+#include <cstdio>
 
 #define SOUND_AUDIO_CHANNEL_COUNT 2
 #define SOUND_TRACK_COUNT 32
 #define SOUND_IS_LOOPING_INDEFINITELY -1
+#define SOUND_MUSIC_LOADING_THREAD_ERROR_BUFFER_SIZE 512
 
 struct SoundParams {
     ResourceName resource;
@@ -171,6 +173,19 @@ static const std::unordered_map<SoundName, SoundParams> SOUND_PARAMS = {
         .resource = RESOURCE_SOUND_PEN_SCRATCH,
         .variants = 1
     }},
+    { SOUND_STINGER_VICTORY, (SoundParams) {
+        .resource = RESOURCE_SOUND_STINGER_VICTORY,
+        .variants = 1
+    }},
+    { SOUND_STINGER_DEFEAT, (SoundParams) {
+        .resource = RESOURCE_SOUND_STINGER_DEFEAT,
+        .variants = 1
+    }},
+};
+
+struct SoundLoadMusicParams {
+    ResourceName music_resource;
+    uint32_t options;
 };
 
 struct SoundState {
@@ -185,6 +200,9 @@ struct SoundState {
 
     MIX_Audio* music;
     MIX_Track* music_track;
+    SDL_Thread* music_loading_thread;
+    SoundLoadMusicParams music_load_params;
+    char music_loading_thread_error[SOUND_MUSIC_LOADING_THREAD_ERROR_BUFFER_SIZE];
 };
 static SoundState state;
 
@@ -269,6 +287,7 @@ bool sound_init() {
         return false;
     }
     state.music = NULL;
+    state.music_loading_thread = NULL;
 
     option_apply(OPTION_SFX_VOLUME);
     option_apply(OPTION_MUSIC_VOLUME);
@@ -278,6 +297,11 @@ bool sound_init() {
 }
 
 void sound_quit() {
+    if (state.music_loading_thread) {
+        SDL_WaitThread(state.music_loading_thread, NULL);
+        state.music_loading_thread = NULL;
+    }
+
     // Free properties
     SDL_DestroyProperties(state.sound_properties_loop_indefinitely);
 
@@ -379,6 +403,10 @@ const char* sound_get_name(SoundName sound) {
             return "AVALANCHE";
         case SOUND_PEN_SCRATCH:
             return "PEN_SCRATCH";
+        case SOUND_STINGER_VICTORY:
+            return "STINGER_VICTORY";
+        case SOUND_STINGER_DEFEAT:
+            return "STINGER_DEFEAT";
         case SOUND_COUNT:
             GOLD_ASSERT(false);
             return "";
@@ -387,12 +415,28 @@ const char* sound_get_name(SoundName sound) {
 
 void sound_set_sfx_volume(uint32_t volume) {
     for (uint32_t track_index = 0; track_index < SOUND_TRACK_COUNT; track_index++) {
-        MIX_SetTrackGain(state.tracks[track_index], (float)volume / 100.0f);
+        // Sound is mixed to 90% of music
+        MIX_SetTrackGain(state.tracks[track_index], ((float)volume / 100.0f) * 0.9f);
     }
 }
 
 void sound_set_music_volume(uint32_t volume) {
     MIX_SetTrackGain(state.music_track, (float)volume / 100.0f);
+}
+
+void sound_update() {
+    if (state.music_loading_thread != NULL && SDL_GetThreadState(state.music_loading_thread) == SDL_THREAD_COMPLETE) {
+        // Clean up the thread
+        int error_code;
+        SDL_WaitThread(state.music_loading_thread, &error_code);
+        state.music_loading_thread = NULL;
+
+        if (error_code) {
+            log_error("Music loading thread finished with error: %s", state.music_loading_thread_error);
+        } else {
+            log_info("Music loading finished successfully.");
+        }
+    }
 }
 
 uint32_t sound_play(SoundName sound, bool looping) {
@@ -429,39 +473,43 @@ uint32_t sound_play(SoundName sound, bool looping) {
     return available_track_index;
 }
 
-void sound_play_music(ResourceName music_resource, uint32_t options) {
+static int sound_load_music(void* /*ptr */) {
+    SDL_PropertiesID playback_properties = 0;
+    int error = 0;
+
     // Load the music resource
     size_t resource_length;
-    void* resource_data = resource_load(music_resource, &resource_length);
+    void* resource_data = resource_load(state.music_load_params.music_resource, &resource_length, true);
 
     // Init the music audio
     SDL_IOStream* io_stream = SDL_IOFromMem(resource_data, resource_length);
     MIX_Audio* music = MIX_LoadAudio_IO(state.mixer, io_stream, false, true);
     if (!music) {
-        log_error("Failed to load music. %s", SDL_GetError());
-        return;
+        sprintf(state.music_loading_thread_error, "Failed to load music. %s", SDL_GetError());
+        error = 1;
+        goto end;
     }
 
     // Configure playback options
-    SDL_PropertiesID playback_properties = 0;
-    if (options != 0) {
+    if (state.music_load_params.options != 0) {
         playback_properties = SDL_CreateProperties();
         if (!playback_properties) {
-            log_error("Failed to create sound properties.", SDL_GetError());
-            return;
+            sprintf(state.music_loading_thread_error, "Failed to create sound properties. %s", SDL_GetError());
+            error = 1;
+            goto end;
         }
 
-        if (bitflag_check(options, MUSIC_OPTION_FADE_IN)) {
+        if (bitflag_check(state.music_load_params.options, MUSIC_OPTION_FADE_IN)) {
             SDL_SetNumberProperty(playback_properties, MIX_PROP_PLAY_FADE_IN_MILLISECONDS_NUMBER, 3000);
         }
-        if (bitflag_check(options, MUSIC_OPTION_LOOP)) {
+        if (bitflag_check(state.music_load_params.options, MUSIC_OPTION_LOOP)) {
             SDL_SetNumberProperty(playback_properties, MIX_PROP_PLAY_LOOPS_NUMBER, SOUND_IS_LOOPING_INDEFINITELY);
         }
     }
 
     // Stop the previous music
     if (state.music != NULL && sound_is_music_playing()) {
-        sound_stop_music();
+        MIX_StopTrack(state.music_track, 0);
         MIX_DestroyAudio(state.music);
     }
 
@@ -471,14 +519,42 @@ void sound_play_music(ResourceName music_resource, uint32_t options) {
     MIX_PlayTrack(state.music_track, playback_properties);
 
     // Clean up
-    SDL_DestroyProperties(playback_properties);
-    free(resource_data);
+end:
+    if (playback_properties) {
+        SDL_DestroyProperties(playback_properties);
+    }
+    if (resource_data) {
+        free(resource_data);
+    }
 
-    log_info("Started music track %s.", resource_get_path(music_resource));
+    return error;
+}
+
+void sound_play_music(ResourceName music_resource, uint32_t options) {
+    // If we are currently loading a track, wait for that load to finish
+    // This ensures no resources are leaked in the loading thread and it
+    // ensures that the loading thread is available
+    if (state.music_loading_thread) {
+        log_warn("Called sound_play_music while another track was being loaded.");
+        SDL_WaitThread(state.music_loading_thread, NULL);
+    }
+
+    // Populate params for thread
+    state.music_load_params.music_resource = music_resource;
+    state.music_load_params.options = options;
+
+    // Create music loading thread
+    state.music_loading_thread = SDL_CreateThread(sound_load_music, "music_loading_thread", NULL);
+    if (!state.music_loading_thread) {
+        log_error("Failed to create music loading thread %s", SDL_GetError());
+        return;
+    }
+
+    log_info("Starting music track %s.", resource_get_path(music_resource));
 }
 
 bool sound_is_music_playing() {
-    return MIX_TrackPlaying(state.music_track);
+    return state.music_loading_thread != NULL || MIX_TrackPlaying(state.music_track);
 }
 
 void sound_stop(uint32_t track_index) {
@@ -486,12 +562,28 @@ void sound_stop(uint32_t track_index) {
 }
 
 void sound_stop_music() {
+    if (state.music_loading_thread) {
+        SDL_WaitThread(state.music_loading_thread, NULL);
+        state.music_loading_thread = NULL;
+    }
     MIX_StopTrack(state.music_track, 0);
+}
+
+void sound_pause_music() {
+    if (state.music_loading_thread) {
+        SDL_WaitThread(state.music_loading_thread, NULL);
+        state.music_loading_thread = NULL;
+    }
+    MIX_PauseTrack(state.music_track);
+}
+
+void sound_resume_music() {
+    MIX_ResumeTrack(state.music_track);
 }
 
 void sound_stop_all() {
     for (uint32_t track_index = 0; track_index < SOUND_TRACK_COUNT; track_index++) {
         MIX_StopTrack(state.tracks[track_index], 0);
     }
-    MIX_StopTrack(state.music_track, 0);
+    sound_stop_music();
 }

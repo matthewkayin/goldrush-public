@@ -359,10 +359,10 @@ const char* network_get_lobby_name() {
 
 #ifdef GOLD_STEAM
 
-void network_steam_accept_invite(CSteamID lobby_id) {
-    log_debug("Called network_steam_accept_invite with lobby_id %u", lobby_id.ConvertToUint64());
+void network_steam_accept_invite(uint64_t lobby_id) {
+    log_debug("Called network_steam_accept_invite with lobby_id %u", lobby_id);
 
-    state->steam_invite_lobby_id = lobby_id;
+    state->steam_invite_lobby_id.SetFromUint64(lobby_id);
     bool success = SteamMatchmaking()->RequestLobbyData(state->steam_invite_lobby_id);
 
     log_debug("Network steam requested lobby data. success? %i", (int)success);
@@ -373,7 +373,7 @@ void network_steam_accept_invite(CSteamID lobby_id) {
 // invites that players accept while in-game in the same fashion as we accept invites from
 // the command line (when steam launches goldrush with +connect_lobby <lobby_id>)
 void NetworkState::on_steam_lobby_join_requested(GameLobbyJoinRequested_t* join_requested) {
-    network_steam_accept_invite(join_requested->m_steamIDLobby);
+    network_steam_accept_invite(join_requested->m_steamIDLobby.ConvertToUint64());
 }
 
 void NetworkState::on_steam_lobby_data_update(LobbyDataUpdate_t* lobby_data_update) {
@@ -401,6 +401,10 @@ void NetworkState::on_steam_lobby_data_update(LobbyDataUpdate_t* lobby_data_upda
 
     log_debug("Network Steam pushed NETWORK_EVENT_STEAM_INVITE");
 }
+
+#else
+
+void network_steam_accept_invite(uint64_t /*lobby_id*/) {}
 
 #endif
 

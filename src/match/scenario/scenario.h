@@ -95,4 +95,4 @@ Scenario* scenario_open_file(const char* path);
 
 bool scenario_export(const Scenario* scenario, const char* full_path);
 Scenario* scenario_import(const char* path);
-void scenario_export_all();
+bool scenario_export_all();

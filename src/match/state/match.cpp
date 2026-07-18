@@ -403,6 +403,9 @@ void match_handle_input(MatchState& state, const MatchInput& input) {
 
             // Destroy the building
             state.entities[building_index].health = 0;
+
+            // Send an event
+            match_event_building_cancelled(state, input.build_cancel.building_id);
             break;
         }
         case MATCH_INPUT_BUILDING_ENQUEUE: {
@@ -613,7 +616,7 @@ void match_update(MatchState& state) {
             if (projectile.position.distance_to(projectile.target) <= PROJECTILE_MOLOTOV_SPEED) {
                 // On projectile finish
                 if (projectile.type == PROJECTILE_MOLOTOV) {
-                    match_set_cell_on_fire(state, projectile.target.to_ivec2() / TILE_SIZE, projectile.target.to_ivec2() / TILE_SIZE);
+                    match_set_cell_on_fire(state, projectile.target.to_ivec2() / TILE_SIZE, projectile.target.to_ivec2() / TILE_SIZE, projectile.source_player_id);
                     // Check that it's actually on fire before playing the sound
                     if (match_is_cell_on_fire(state, projectile.target.to_ivec2() / TILE_SIZE)) {
                         match_event_play_sound(state, SOUND_MOLOTOV_IMPACT, projectile.target.to_ivec2());
@@ -645,7 +648,7 @@ void match_update(MatchState& state) {
                     if (map_get_tile(state.map, child_cell).elevation != fire_elevation && !map_is_tile_ramp(state.map, child_cell)) {
                         continue;
                     }
-                    match_set_cell_on_fire(state, child_cell, state.fires[fire_index].source);
+                    match_set_cell_on_fire(state, child_cell, state.fires[fire_index].source_cell, state.fires[fire_index].source_player_id);
                 }
             // Fire is in prolonged burn, count down time to live
             } else if (state.fires[fire_index].animation.name == ANIMATION_FIRE_BURN) {
@@ -971,7 +974,7 @@ void match_event_play_sound(MatchState& state, SoundName sound, ivec2 position) 
     state.events.push(event);
 }
 
-void match_event_alert(MatchState& state, MatchAlertType type, uint8_t player_id, ivec2 cell, int cell_size) {
+void match_event_alert(MatchState& state, MatchAlertType type, uint8_t player_id, ivec2 cell, int cell_size, EntityType entity_type) {
     MatchEvent event;
     memset(&event, 0, sizeof(event));
 
@@ -980,6 +983,7 @@ void match_event_alert(MatchState& state, MatchAlertType type, uint8_t player_id
     event.alert.player_id = player_id;
     event.alert.cell = cell;
     event.alert.cell_size = cell_size;
+    event.alert.entity_type = entity_type;
 
     state.events.push(event);
 }
@@ -1036,8 +1040,43 @@ void match_event_entity_killed(MatchState& state, EntityId attacker_id, EntityId
     event.entity_killed.attacker_id = attacker_id;
     event.entity_killed.defender_id = defender_id;
 
+    state.events.push(event);
+
+    // Also push a building cancelled event if this was an in-progress building
     const Entity& defender = state.entities.get_by_id(defender_id);
-    event.entity_killed.defender_was_in_progress_building = defender.mode == MODE_BUILDING_IN_PROGRESS;
+    if (defender.mode == MODE_BUILDING_IN_PROGRESS) {
+        match_event_building_cancelled(state, defender_id);
+    }
+}
+
+void match_event_building_cancelled(MatchState& state, EntityId building_id) {
+    MatchEvent event;
+    memset(&event, 0, sizeof(event));
+
+    event.type = MATCH_EVENT_BUILDING_CANCELLED;
+    event.building_cancelled.building_id = building_id;
+
+    state.events.push(event);
+}
+
+void match_event_unit_unloaded(MatchState& state, EntityId unit_id) {
+    MatchEvent event;
+    memset(&event, 0, sizeof(event));
+
+    event.type = MATCH_EVENT_UNIT_UNLOADED;
+    event.unit_unloaded.unit_id = unit_id;
+
+    state.events.push(event);
+}
+
+void match_event_cell_set_on_fire(MatchState& state, ivec2 cell, ivec2 source_cell, uint8_t source_player_id) {
+    MatchEvent event;
+    memset(&event, 0, sizeof(event));
+
+    event.type = MATCH_EVENT_CELL_SET_ON_FIRE;
+    event.cell_set_on_fire.cell = cell;
+    event.cell_set_on_fire.source_cell = source_cell;
+    event.cell_set_on_fire.source_player_id = source_player_id;
 
     state.events.push(event);
 }
@@ -1225,7 +1264,7 @@ bool match_is_cell_rect_on_fire(const MatchState& state, ivec2 cell, int cell_si
     return false;
 }
 
-void match_set_cell_on_fire(MatchState& state, ivec2 cell, ivec2 source) {
+void match_set_cell_on_fire(MatchState& state, ivec2 cell, ivec2 source_cell, uint32_t source_player_id) {
     if (match_is_cell_on_fire(state, cell)) {
         return;
     }
@@ -1235,16 +1274,20 @@ void match_set_cell_on_fire(MatchState& state, ivec2 cell, ivec2 source) {
     if (map_is_tile_water(state.map, cell)) {
         return;
     }
-    if (ivec2::manhattan_distance(cell, source) > PROJECTILE_MOLOTOV_FIRE_SPREAD ||
-        (cell.x == source.x && std::abs(cell.y - source.y) >= PROJECTILE_MOLOTOV_FIRE_SPREAD) ||
-        (cell.y == source.y && std::abs(cell.x - source.x) >= PROJECTILE_MOLOTOV_FIRE_SPREAD)) {
+    if (ivec2::manhattan_distance(cell, source_cell) > PROJECTILE_MOLOTOV_FIRE_SPREAD ||
+        (cell.x == source_cell.x && std::abs(cell.y - source_cell.y) >= PROJECTILE_MOLOTOV_FIRE_SPREAD) ||
+        (cell.y == source_cell.y && std::abs(cell.x - source_cell.x) >= PROJECTILE_MOLOTOV_FIRE_SPREAD)) {
         return;
     }
     state.fires.push_back((Fire) {
         .cell = cell,
-        .source = source,
+        .source_cell = source_cell,
+        .source_player_id = source_player_id,
         .time_to_live = FIRE_TTL,
         .animation = animation_create(ANIMATION_FIRE_START)
     });
     state.fire_cells[cell.x + (cell.y * state.map.width)] = 1;
+
+    // Send event
+    match_event_cell_set_on_fire(state, cell, source_cell, (uint8_t)source_player_id);
 }

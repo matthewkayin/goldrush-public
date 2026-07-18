@@ -16664,7 +16664,7 @@
 			"type": "Crate",
 			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 100,
+			"gold_held": 200,
 			"cell": {
 				"x": 6,
 				"y": 13
@@ -16674,7 +16674,7 @@
 			"type": "Crate",
 			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 100,
+			"gold_held": 200,
 			"cell": {
 				"x": 115,
 				"y": 51
@@ -16684,7 +16684,7 @@
 			"type": "Crate",
 			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 100,
+			"gold_held": 200,
 			"cell": {
 				"x": 13,
 				"y": 89
@@ -17131,50 +17131,20 @@
 			}
 		},
 		{
-			"type": "Miner",
-			"player_id": 0,
+			"type": "Crate",
+			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 0,
+			"gold_held": 200,
 			"cell": {
-				"x": 87,
-				"y": 72
-			}
-		},
-		{
-			"type": "Miner",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 88,
-				"y": 72
-			}
-		},
-		{
-			"type": "Miner",
-			"player_id": 0,
-			"is_rigged": false,
-			"gold_held": 0,
-			"cell": {
-				"x": 89,
-				"y": 72
+				"x": 44,
+				"y": 11
 			}
 		},
 		{
 			"type": "Crate",
 			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 100,
-			"cell": {
-				"x": 93,
-				"y": 6
-			}
-		},
-		{
-			"type": "Crate",
-			"player_id": 4,
-			"is_rigged": false,
-			"gold_held": 100,
+			"gold_held": 200,
 			"cell": {
 				"x": 36,
 				"y": 67
@@ -17184,10 +17154,50 @@
 			"type": "Crate",
 			"player_id": 4,
 			"is_rigged": false,
-			"gold_held": 100,
+			"gold_held": 200,
 			"cell": {
-				"x": 44,
-				"y": 11
+				"x": 93,
+				"y": 6
+			}
+		},
+		{
+			"type": "Bandit",
+			"player_id": 0,
+			"is_rigged": false,
+			"gold_held": 0,
+			"cell": {
+				"x": 75,
+				"y": 75
+			}
+		},
+		{
+			"type": "Bandit",
+			"player_id": 0,
+			"is_rigged": false,
+			"gold_held": 0,
+			"cell": {
+				"x": 76,
+				"y": 74
+			}
+		},
+		{
+			"type": "Bandit",
+			"player_id": 0,
+			"is_rigged": false,
+			"gold_held": 0,
+			"cell": {
+				"x": 77,
+				"y": 75
+			}
+		},
+		{
+			"type": "Bandit",
+			"player_id": 0,
+			"is_rigged": false,
+			"gold_held": 0,
+			"cell": {
+				"x": 78,
+				"y": 74
 			}
 		}
 	],

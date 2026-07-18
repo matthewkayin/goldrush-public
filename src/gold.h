@@ -2,7 +2,6 @@
 
 #include "menu/menu.h"
 #include "match/shell/shell.h"
-#include "util/json.h"
 
 #include <SDL3/SDL.h>
 #include <cstdint>
@@ -15,7 +14,6 @@ enum LaunchMode {
     LAUNCH_MODE_TEST_JOIN,
     LAUNCH_MODE_EDITOR,
     LAUNCH_MODE_LUA_DOC,
-    LAUNCH_MODE_RESOURCE_PACK,
     LAUNCH_MODE_ROAD_DATA,
     LAUNCH_MODE_SCENARIO_EXPORT
 };

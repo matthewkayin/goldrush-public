@@ -34,3 +34,8 @@ GOLDRUSH_FFI uint32_t get_index_of(EntityId entity_id) {
     const MatchShell* shell = script_get_match_shell();
     return shell->match_state.entities.get_index_of(entity_id);
 }
+
+GOLDRUSH_FFI bool is_visible_to_player(EntityId entity_id, uint8_t player_id) {
+    const MatchShell* shell = script_get_match_shell();
+    return entity_is_visible_to_player(shell->match_state, shell->match_state.entities.get_by_id(entity_id), player_id);
+}

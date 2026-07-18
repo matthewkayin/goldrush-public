@@ -902,7 +902,7 @@ void entity_update(MatchState& state, uint32_t entity_index) {
                         }
 
                         // Collect gold from crate
-                        if (target.type == ENTITY_CRATE && target.gold_held > 0) {
+                        if (target.type == ENTITY_CRATE && target.gold_held > 0 && entity_data.cell_layer == CELL_LAYER_GROUND) {
                             state.players[entity.player_id].gold += target.gold_held;
                             target.gold_held = 0;
                             match_event_play_sound(state, SOUND_GOLD_PICKUP, target.position.to_ivec2());
@@ -1275,7 +1275,7 @@ void entity_update(MatchState& state, uint32_t entity_index) {
                         }
 
                         // Create alert
-                        match_event_alert(state, MATCH_ALERT_TYPE_UNIT, unit.player_id, unit.cell, entity_get_data(unit.type).cell_size);
+                        match_event_alert(state, MATCH_ALERT_TYPE_UNIT, unit.player_id, unit.cell, entity_get_data(unit.type).cell_size, unit.type);
 
                         entity_building_dequeue(state, entity);
                     } else if (entity.timer == 0 && entity.queue[0].type == BUILDING_QUEUE_ITEM_UPGRADE) {
@@ -1404,7 +1404,8 @@ void entity_update(MatchState& state, uint32_t entity_index) {
                 state.projectiles.push_back((Projectile) {
                     .type = PROJECTILE_MOLOTOV,
                     .position = entity.position + ivec2(DIRECTION_IVEC2[entity.direction] * 6),
-                    .target = cell_center(entity.target.cell)
+                    .target = cell_center(entity.target.cell),
+                    .source_player_id = entity.player_id
                 });
             }
         } else if (entity.mode == MODE_MINE_PRIME) {
@@ -2580,6 +2581,9 @@ void entity_unload_unit(MatchState& state, Entity& carrier, EntityId garrisoned_
             garrisoned_unit.garrison_id = ID_NULL;
             garrisoned_unit.goldmine_id = ID_NULL;
 
+            // Send event
+            match_event_unit_unloaded(state, carrier.garrisoned_units[index]);
+
             // Remove the unit from the garrisoned units list
             // Choosing to use remove_at_ordered for this so that it looks good in the UI, and because there's only 4 elements anyways
             carrier.garrisoned_units.remove_at_ordered(index);
@@ -2611,6 +2615,10 @@ void entity_release_garrisoned_units_on_death(MatchState& state, Entity& entity)
                         .type = CELL_UNIT, .id = garrisoned_unit_id
                     });
                     match_fog_update(state, state.players[garrisoned_unit.player_id].team, garrisoned_unit.cell, garrisoned_unit_data.cell_size, garrisoned_unit_data.sight, entity_has_detection(state, garrisoned_unit), garrisoned_unit_data.cell_layer, true);
+
+                    // Send event
+                    match_event_unit_unloaded(state, garrisoned_unit_id);
+
                     unit_is_placed = true;
                     break;
                 }
@@ -2671,6 +2679,9 @@ void entity_explode(MatchState& state, EntityId entity_id) {
         map_set_cell(state.map, CELL_LAYER_UNDERGROUND, entity.cell, (Cell) { .type = CELL_EMPTY, .id = ID_NULL });
     }
 
+    // Send an alert to the player who controls the exploding entity
+    // This way they can be notified if an explosion goes off (i.e. if enemies have blown up their mines)
+    match_event_alert(state, MATCH_ALERT_TYPE_ATTACK, entity.player_id, entity.cell, entity_data.cell_size);
     match_event_play_sound(state, SOUND_EXPLOSION, entity.position.to_ivec2());
 
     // Create particle
@@ -2761,7 +2772,7 @@ void entity_building_finish(MatchState& state, EntityId building_id) {
     building.mode = MODE_BUILDING_FINISHED;
 
     // Show alert
-    match_event_alert(state, MATCH_ALERT_TYPE_BUILDING, building.player_id, building.cell, building_cell_size);
+    match_event_alert(state, MATCH_ALERT_TYPE_BUILDING, building.player_id, building.cell, building_cell_size, building.type);
 
     for (uint32_t entity_index = 0; entity_index < state.entities.size(); entity_index++) {
         Entity& entity = state.entities[entity_index];

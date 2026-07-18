@@ -1,15 +1,17 @@
 #include "shell.h"
 
+#include "core/achievements.h"
 #include "core/input.h"
-#include "core/resource.h"
 #include "core/sound.h"
 #include "core/options.h"
 #include "core/cursor.h"
 #include "defines.h"
+#include "match/shell/achievements.h"
 #include "match/state/map_gen.h"
 #include "match/state/match.h"
 #include "match/state/upgrade.h"
 #include "network/network.h"
+#include "shared/match_setting.h"
 #include "shared/options_menu.h"
 #include "util/adler32.h"
 #include "util/simplex_noise.h"
@@ -190,8 +192,8 @@ MatchShell* match_shell_init_match(RawMap* raw_map, int32_t lcg_seed) {
         shell->scenario_allowed_upgrades |= (1U << upgrade_index);
     }
 
-    // TODO:
-    // state->achievements_state = achievements_state_init(false);
+    // Init achievements tracker
+    shell->achievements_tracker = achievements_tracker_init(ACHIEVEMENTS_MATCH_TYPE_SKIRMISH);
 
     shell->mode = MATCH_SHELL_MODE_NOT_STARTED;
 
@@ -316,7 +318,8 @@ MatchShell* match_shell_init_scenario(const Scenario* scenario, const char* scri
         return nullptr;
     }
 
-    // TODO: init achievements state
+    // Init achievements tracker
+    shell->achievements_tracker = achievements_tracker_init(ACHIEVEMENTS_MATCH_TYPE_SCENARIO);
 
     return shell;
 }
@@ -450,7 +453,10 @@ void match_shell_update(MatchShell* shell) {
     if (shell->music_begin_timer != 0) {
         shell->music_begin_timer--;
     }
-    if (shell->music_begin_timer == 0 && !sound_is_music_playing()) {
+    if (shell->music_begin_timer == 0 && !sound_is_music_playing() &&
+            shell->mode != MATCH_SHELL_MODE_MATCH_OVER_VICTORY &&
+            shell->mode != MATCH_SHELL_MODE_MATCH_OVER_DEFEAT) {
+        ZoneScopedN("match_shell_switch_music");
         sound_play_music((ResourceName)shell->music_next_track, 0);
         shell->music_next_track++;
         if (shell->music_next_track == RESOURCE_MUSIC_MATCH1 + MATCH_SHELL_MUSIC_TRACK_COUNT) {
@@ -518,6 +524,7 @@ void match_shell_update(MatchShell* shell) {
 
     // Alerts update
     {
+        ZoneScopedN("match_shell_alerts_update");
         uint32_t alert_index = 0;
         while (alert_index < shell->alerts.size()) {
             shell->alerts[alert_index].timer--;
@@ -558,6 +565,7 @@ void match_shell_update(MatchShell* shell) {
 
     // Compute checksum
     if (!shell->replay_mode && shell->match_timer % desync_get_checksum_frequency() == 0) {
+        ZoneScopedN("match_shell_compute_checksum");
         uint32_t checksum = adler32_simd((uint8_t*)&shell->match_state, DESYNC_BUFFER_SIZE);
         desync_write_frame((uint8_t*)&shell->match_state, shell->match_timer);
         network_send_checksum(checksum);
@@ -591,184 +599,196 @@ void match_shell_update(MatchShell* shell) {
     shell->match_timer++;
 
     // Match events
-    while (!shell->match_state.events.empty()) {
-        const MatchEvent event = shell->match_state.events.front();
-        shell->match_state.events.pop();
-        switch (event.type) {
-            case MATCH_EVENT_SOUND: {
-                if (shell->sound_cooldown_timers[event.sound.sound] != 0) {
-                    break;
-                }
-                if (!match_shell_is_cell_rect_revealed(shell, event.sound.position / TILE_SIZE, 1)) {
-                    break;
-                }
-                if (SOUND_LISTEN_RECT.has_point(event.sound.position - shell->camera_offset)) {
-                    sound_play(event.sound.sound);
-                    shell->sound_cooldown_timers[event.sound.sound] = SOUND_COOLDOWN_DURATION;
-                }
+    {
+        ZoneScopedN("match_shell_handle_events");
+        while (!shell->match_state.events.empty()) {
+            const MatchEvent event = shell->match_state.events.front();
+            shell->match_state.events.pop();
 
-                break;
+            // Achievements event handling
+            if (!shell->replay_mode) {
+                achievements_tracker_handle_event(shell->achievements_tracker, shell->match_state, event, shell->match_timer);
             }
-            case MATCH_EVENT_ALERT: {
-                if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
-                    break;
-                }
-                if ((event.alert.type == MATCH_ALERT_TYPE_ATTACK && shell->match_state.players[event.alert.player_id].team != shell->match_state.players[network_get_player_id()].team) ||
-                    (event.alert.type != MATCH_ALERT_TYPE_ATTACK && event.alert.player_id != network_get_player_id())) {
-                    break;
-                }
 
-                // Check if an existing attack alert already exists nearby
-                if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
-                    bool is_existing_attack_alert_nearby = false;
-                    for (const Alert& existing_alert : shell->alerts) {
-                        if (existing_alert.pixel == MINIMAP_PIXEL_WHITE && ivec2::manhattan_distance(existing_alert.cell, event.alert.cell) < ATTACK_ALERT_DISTANCE) {
-                            is_existing_attack_alert_nearby = true;
+            switch (event.type) {
+                case MATCH_EVENT_SOUND: {
+                    if (shell->sound_cooldown_timers[event.sound.sound] != 0) {
+                        break;
+                    }
+                    if (!match_shell_is_cell_rect_revealed(shell, event.sound.position / TILE_SIZE, 1)) {
+                        break;
+                    }
+                    if (SOUND_LISTEN_RECT.has_point(event.sound.position - shell->camera_offset)) {
+                        sound_play(event.sound.sound);
+                        shell->sound_cooldown_timers[event.sound.sound] = SOUND_COOLDOWN_DURATION;
+                    }
+
+                    break;
+                }
+                case MATCH_EVENT_ALERT: {
+                    if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
+                        break;
+                    }
+                    if ((event.alert.type == MATCH_ALERT_TYPE_ATTACK && shell->match_state.players[event.alert.player_id].team != shell->match_state.players[network_get_player_id()].team) ||
+                        (event.alert.type != MATCH_ALERT_TYPE_ATTACK && event.alert.player_id != network_get_player_id())) {
+                        break;
+                    }
+
+                    // Check if an existing attack alert already exists nearby
+                    if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
+                        bool is_existing_attack_alert_nearby = false;
+                        for (const Alert& existing_alert : shell->alerts) {
+                            if (existing_alert.pixel == MINIMAP_PIXEL_WHITE && ivec2::manhattan_distance(existing_alert.cell, event.alert.cell) < ATTACK_ALERT_DISTANCE) {
+                                is_existing_attack_alert_nearby = true;
+                                break;
+                            }
+                        }
+                        if (is_existing_attack_alert_nearby) {
                             break;
                         }
                     }
-                    if (is_existing_attack_alert_nearby) {
+
+
+                    // Play the sound even if we don't show the alert
+                    switch (event.alert.type) {
+                        case MATCH_ALERT_TYPE_BUILDING:
+                            sound_play(SOUND_ALERT_BUILDING);
+                            break;
+                        case MATCH_ALERT_TYPE_UNIT:
+                            sound_play(SOUND_ALERT_UNIT);
+                            break;
+                        case MATCH_ALERT_TYPE_RESEARCH:
+                            sound_play(SOUND_ALERT_RESEARCH);
+                            break;
+                        case MATCH_ALERT_TYPE_MINE_COLLAPSE:
+                            // Since the mine plays a sound effect that those nearby can hear,
+                            // we should only play this sound if the player's camera is out-of-range of the sound
+                            if (!SOUND_LISTEN_RECT.has_point((event.alert.cell * TILE_SIZE) - shell->camera_offset)) {
+                                sound_play(SOUND_GOLD_MINE_COLLAPSE);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    shell->latest_alert_cell = event.alert.cell;
+
+                    Rect camera_rect = (Rect) {
+                        .x = shell->camera_offset.x,
+                        .y = shell->camera_offset.y,
+                        .w = SCREEN_WIDTH,
+                        .h = SCREEN_HEIGHT
+                    };
+                    Rect alert_rect = (Rect) {
+                        .x = event.alert.cell.x * TILE_SIZE,
+                        .y = event.alert.cell.y * TILE_SIZE,
+                        .w = event.alert.cell_size * TILE_SIZE,
+                        .h = event.alert.cell_size * TILE_SIZE
+                    };
+                    // If the player is already looking at the alert location, then don't show the alert
+                    if (camera_rect.intersects(alert_rect)) {
                         break;
                     }
-                }
 
-
-                // Play the sound even if we don't show the alert
-                switch (event.alert.type) {
-                    case MATCH_ALERT_TYPE_BUILDING:
-                        sound_play(SOUND_ALERT_BUILDING);
-                        break;
-                    case MATCH_ALERT_TYPE_UNIT:
-                        sound_play(SOUND_ALERT_UNIT);
-                        break;
-                    case MATCH_ALERT_TYPE_RESEARCH:
-                        sound_play(SOUND_ALERT_RESEARCH);
-                        break;
-                    case MATCH_ALERT_TYPE_MINE_COLLAPSE:
-                        // Since the mine plays a sound effect that those nearby can hear,
-                        // we should only play this sound if the player's camera is out-of-range of the sound
-                        if (!SOUND_LISTEN_RECT.has_point((event.alert.cell * TILE_SIZE) - shell->camera_offset)) {
-                            sound_play(SOUND_GOLD_MINE_COLLAPSE);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-                shell->latest_alert_cell = event.alert.cell;
-
-                Rect camera_rect = (Rect) {
-                    .x = shell->camera_offset.x,
-                    .y = shell->camera_offset.y,
-                    .w = SCREEN_WIDTH,
-                    .h = SCREEN_HEIGHT
-                };
-                Rect alert_rect = (Rect) {
-                    .x = event.alert.cell.x * TILE_SIZE,
-                    .y = event.alert.cell.y * TILE_SIZE,
-                    .w = event.alert.cell_size * TILE_SIZE,
-                    .h = event.alert.cell_size * TILE_SIZE
-                };
-                // If the player is already looking at the alert location, then don't show the alert
-                if (camera_rect.intersects(alert_rect)) {
-                    break;
-                }
-
-                MinimapPixel pixel;
-                if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
-                    pixel = MINIMAP_PIXEL_WHITE;
-                } else if (event.alert.type == MATCH_ALERT_TYPE_MINE_COLLAPSE || event.alert.type == MATCH_ALERT_TYPE_MINE_RUNNING_LOW) {
-                    pixel = MINIMAP_PIXEL_GOLD;
-                } else {
-                    pixel = (MinimapPixel)(MINIMAP_PIXEL_PLAYER0 + shell->match_state.players[network_get_player_id()].recolor_id);
-                }
-
-                shell->alerts.push_back((Alert) {
-                    .pixel = pixel,
-                    .cell = event.alert.cell,
-                    .cell_size = event.alert.cell_size,
-                    .timer = ALERT_TOTAL_DURATION
-                });
-
-                if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
-                    match_shell_show_status(shell, event.alert.player_id == network_get_player_id()
-                                                    ? MATCH_UI_STATUS_UNDER_ATTACK
-                                                    : MATCH_UI_STATUS_ALLY_UNDER_ATTACK);
-                    sound_play(SOUND_ALERT_BELL);
-                }
-                break;
-            }
-            case MATCH_EVENT_SELECTION_HANDOFF: {
-                if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
-                    break;
-                }
-                if (event.selection_handoff.player_id != network_get_player_id()) {
-                    break;
-                }
-
-                if (shell->selection.size() == 1 && shell->selection[0] == event.selection_handoff.to_deselect) {
-                    if (match_shell_is_in_menu(shell)) {
-                        shell->selection.clear();
+                    MinimapPixel pixel;
+                    if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
+                        pixel = MINIMAP_PIXEL_WHITE;
+                    } else if (event.alert.type == MATCH_ALERT_TYPE_MINE_COLLAPSE || event.alert.type == MATCH_ALERT_TYPE_MINE_RUNNING_LOW) {
+                        pixel = MINIMAP_PIXEL_GOLD;
                     } else {
-                        std::vector<EntityId> new_selection;
-                        new_selection.push_back(event.selection_handoff.to_select);
-                        match_shell_set_selection(shell, new_selection);
+                        pixel = (MinimapPixel)(MINIMAP_PIXEL_PLAYER0 + shell->match_state.players[network_get_player_id()].recolor_id);
                     }
-                }
-                break;
-            }
-            case MATCH_EVENT_STATUS: {
-                if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
-                    break;
-                }
-                if (network_get_player_id() == event.status.player_id) {
-                    match_shell_show_status(shell, event.status.message);
-                }
-                break;
-            }
-            case MATCH_EVENT_RESEARCH_COMPLETE: {
-                if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
-                    break;
-                }
-                if (event.research_complete.player_id != network_get_player_id()) {
-                    break;
-                }
 
-                char message[128];
-                sprintf(message, "%s research complete.", upgrade_get_data(event.research_complete.upgrade).name);
-                match_shell_show_status(shell, message);
-                break;
-            }
-            case MATCH_EVENT_PLAYER_DEFEATED: {
-                char defeat_message[128];
-                sprintf(defeat_message, "%s has been defeated.", shell->match_state.players[event.player_defeated.player_id].name);
-                match_shell_add_chat_message(shell, FONT_HACK_WHITE, "", defeat_message, CHAT_MESSAGE_DURATION);
+                    shell->alerts.push_back((Alert) {
+                        .pixel = pixel,
+                        .cell = event.alert.cell,
+                        .cell_size = event.alert.cell_size,
+                        .timer = ALERT_TOTAL_DURATION
+                    });
 
-                if (!shell->replay_mode &&
-                        event.player_defeated.player_id == network_get_player_id()) {
-                    shell->match_over_timer = MATCH_OVER_TIMER_DURATION;
-                    shell->match_over_is_victory = false;
+                    if (event.alert.type == MATCH_ALERT_TYPE_ATTACK) {
+                        match_shell_show_status(shell, event.alert.player_id == network_get_player_id()
+                                                        ? MATCH_UI_STATUS_UNDER_ATTACK
+                                                        : MATCH_UI_STATUS_ALLY_UNDER_ATTACK);
+                        sound_play(SOUND_ALERT_BELL);
+                    }
                     break;
                 }
+                case MATCH_EVENT_SELECTION_HANDOFF: {
+                    if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
+                        break;
+                    }
+                    if (event.selection_handoff.player_id != network_get_player_id()) {
+                        break;
+                    }
 
-                if (!shell->replay_mode &&
-                        shell->scenario_lua_state == NULL &&
-                        !match_shell_is_at_least_one_opponent_in_match(shell)) {
-                    shell->match_over_timer = MATCH_OVER_TIMER_DURATION;
-                    shell->match_over_is_victory = true;
+                    if (shell->selection.size() == 1 && shell->selection[0] == event.selection_handoff.to_deselect) {
+                        if (match_shell_is_in_menu(shell)) {
+                            shell->selection.clear();
+                        } else {
+                            std::vector<EntityId> new_selection;
+                            new_selection.push_back(event.selection_handoff.to_select);
+                            match_shell_set_selection(shell, new_selection);
+                        }
+                    }
                     break;
                 }
+                case MATCH_EVENT_STATUS: {
+                    if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
+                        break;
+                    }
+                    if (network_get_player_id() == event.status.player_id) {
+                        match_shell_show_status(shell, event.status.message);
+                    }
+                    break;
+                }
+                case MATCH_EVENT_RESEARCH_COMPLETE: {
+                    if (shell->replay_mode || shell->match_state.players[network_get_player_id()].mode != PLAYER_MODE_ACTIVE) {
+                        break;
+                    }
+                    if (event.research_complete.player_id != network_get_player_id()) {
+                        break;
+                    }
 
-                break;
-            }
-            case MATCH_EVENT_ENTITY_KILLED: {
-                break;
+                    char message[128];
+                    sprintf(message, "%s research complete.", upgrade_get_data(event.research_complete.upgrade).name);
+                    match_shell_show_status(shell, message);
+                    break;
+                }
+                case MATCH_EVENT_PLAYER_DEFEATED: {
+                    char defeat_message[128];
+                    sprintf(defeat_message, "%s has been defeated.", shell->match_state.players[event.player_defeated.player_id].name);
+                    match_shell_add_chat_message(shell, FONT_HACK_WHITE, "", defeat_message, CHAT_MESSAGE_DURATION);
+
+                    if (!shell->replay_mode &&
+                            event.player_defeated.player_id == network_get_player_id()) {
+                        shell->match_over_timer = MATCH_OVER_TIMER_DURATION;
+                        shell->match_over_is_victory = false;
+                        break;
+                    }
+
+                    if (!shell->replay_mode &&
+                            shell->scenario_lua_state == NULL &&
+                            !match_shell_is_at_least_one_opponent_in_match(shell)) {
+                        shell->match_over_timer = MATCH_OVER_TIMER_DURATION;
+                        shell->match_over_is_victory = true;
+                        break;
+                    }
+
+                    break;
+                }
+                case MATCH_EVENT_ENTITY_KILLED:
+                case MATCH_EVENT_BUILDING_CANCELLED:
+                case MATCH_EVENT_UNIT_UNLOADED:
+                case MATCH_EVENT_CELL_SET_ON_FIRE: {
+                    break;
+                }
             }
         }
+    }
 
-        if (!shell->replay_mode) {
-            // TODO:
-            // achievements_handle_event(state->achievements_state, state->match_state, event);
-        }
+    // Achievements
+    if (!shell->replay_mode) {
+        achievements_tracker_update(shell->achievements_tracker, shell->match_state, shell->match_timer);
     }
 
     // Scenario script
@@ -989,11 +1009,11 @@ void match_shell_update(MatchShell* shell) {
         if (shell->match_over_timer == 0) {
             if (shell->match_over_is_victory) {
                 GOLD_ASSERT(shell->scenario_lua_state == NULL);
-                shell->mode = MATCH_SHELL_MODE_MATCH_OVER_VICTORY;
+                match_shell_set_match_over_victory(shell);
             } else if (shell->scenario_lua_state != NULL) {
-                shell->mode = MATCH_SHELL_MODE_SCENARIO_DEFEAT;
+                match_shell_set_match_over_defeat(shell);
             } else {
-                shell->mode = MATCH_SHELL_MODE_MATCH_OVER_DEFEAT;
+                match_shell_set_match_over_defeat(shell);
             }
         }
     }
@@ -1024,6 +1044,9 @@ bool match_shell_begin_turn(MatchShell* shell) {
                 match_shell_add_chat_message(shell, match_shell_get_player_font(player_id), prefix, "gg", CHAT_MESSAGE_DURATION);
                 match_shell_handle_player_disconnect(shell, player_id);
                 // handle_player_disconnect should have set the bot to defeated for us
+                if (network_get_match_setting(MATCH_SETTING_DIFFICULTY) == DIFFICULTY_HARD) {
+                    achievement_grant(ACHIEVEMENT_HIGH_NOON);
+                }
                 GOLD_ASSERT(shell->match_state.players[player_id].mode == PLAYER_MODE_DEFEATED);
             }
         }
@@ -1875,6 +1898,18 @@ uint32_t match_shell_update_displayed_gold_amount(uint32_t current_displayed_val
     }
 }
 
+void match_shell_set_match_over_victory(MatchShell* shell) {
+    shell->mode = MATCH_SHELL_MODE_MATCH_OVER_VICTORY;
+    sound_pause_music();
+    sound_play(SOUND_STINGER_VICTORY);
+}
+
+void match_shell_set_match_over_defeat(MatchShell* shell) {
+    shell->mode = MATCH_SHELL_MODE_SCENARIO_DEFEAT;
+    sound_pause_music();
+    sound_play(SOUND_STINGER_DEFEAT);
+}
+
 void match_shell_leave_match(MatchShell* shell, MatchShellMode mode) {
     if (shell->replay_mode) {
         SDL_LockMutex(shell->replay_loading_early_exit_mutex);
@@ -2568,7 +2603,8 @@ void match_shell_handle_player_disconnect(MatchShell* shell, uint8_t player_id) 
     if (shell->match_state.players[player_id].mode == PLAYER_MODE_ACTIVE) {
         shell->match_state.players[player_id].mode = PLAYER_MODE_DEFEATED;
         if (shell->match_state.players[network_get_player_id()].mode == PLAYER_MODE_ACTIVE && !match_shell_is_at_least_one_opponent_in_match(shell)) {
-            shell->mode = MATCH_SHELL_MODE_MATCH_OVER_VICTORY;
+            shell->match_over_timer = MATCH_OVER_TIMER_DURATION;
+            shell->match_over_is_victory = true;
         }
     }
 }

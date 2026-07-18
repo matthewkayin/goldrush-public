@@ -36,11 +36,6 @@ static const uint64_t UPDATE_DURATION = SDL_NS_PER_SECOND / UPDATES_PER_SECOND;
 static GameState state;
 
 int gold_main(int argc, char** argv) {
-    // Steam restart app if necessary
-    if (gold_steam_restart_app_if_necessary()) {
-        return 1;
-    }
-
     // Get launch options
     LaunchOptions launch_options = gold_get_launch_options(argc, argv);
 
@@ -50,19 +45,19 @@ int gold_main(int argc, char** argv) {
         return 0;
     }
 
-    if (launch_options.mode == LAUNCH_MODE_RESOURCE_PACK) {
-        resource_create_pack();
-        return 0;
-    }
-
     if (launch_options.mode == LAUNCH_MODE_ROAD_DATA) {
         render_generate_road_data();
         return 0;
     }
 
     if (launch_options.mode == LAUNCH_MODE_SCENARIO_EXPORT) {
-        scenario_export_all();
-        return 0;
+        bool success = scenario_export_all();
+        return (int)!success;
+    }
+
+    // Steam restart app if necessary
+    if (gold_steam_restart_app_if_necessary()) {
+        return 1;
     }
 
     // Init
@@ -74,9 +69,14 @@ int gold_main(int argc, char** argv) {
     switch (state.launch_mode) {
         case LAUNCH_MODE_MENU:
         case LAUNCH_MODE_TEST_HOST:
-        case LAUNCH_MODE_TEST_JOIN: {
+        case LAUNCH_MODE_TEST_JOIN:
+        case LAUNCH_MODE_LOBBY_INVITE: {
             state.menu_state = menu_init();
             state.mode = GAME_MODE_MENU;
+
+            if (state.launch_mode == LAUNCH_MODE_LOBBY_INVITE) {
+                network_steam_accept_invite(launch_options.steam_invite_id);
+            }
             break;
         }
         case LAUNCH_MODE_EDITOR: {
@@ -86,6 +86,7 @@ int gold_main(int argc, char** argv) {
             break;
         }
         default: {
+            log_warn("Unhandled launch mode %u", state.launch_mode);
             GOLD_ASSERT(false);
             break;
         }
@@ -127,6 +128,9 @@ int gold_main(int argc, char** argv) {
 
                 network_cleanup_event(&event);
             }
+
+            // Sound
+            sound_update();
 
             // Test mode update
             if (state.launch_mode == LAUNCH_MODE_TEST_HOST || state.launch_mode == LAUNCH_MODE_TEST_JOIN) {
@@ -195,7 +199,7 @@ int gold_main(int argc, char** argv) {
         // Render
         render_prepare_frame();
 
-        // Render gaem mode
+        // Render game mode
         switch (state.mode) {
             case GAME_MODE_MENU: {
                 menu_render(state.menu_state);
@@ -258,10 +262,6 @@ LaunchOptions gold_get_launch_options(int argc, char** argv) {
 
         if (gold_get_argv(argc, argv, "--lua-doc", NULL)) {
             launch_options.mode = LAUNCH_MODE_LUA_DOC;
-        }
-
-        if (gold_get_argv(argc, argv, "--resource-pack", NULL)) {
-            launch_options.mode = LAUNCH_MODE_RESOURCE_PACK;
         }
 
         if (gold_get_argv(argc, argv, "--road-data", NULL)) {
@@ -341,12 +341,16 @@ bool gold_init(const LaunchOptions& launch_options) {
         return false;
     }
 
+    // Create saves folder path
+    // Has to happen after Steam API init but before sub-systems init
+    SDL_CreateDirectory(filesystem_get_saves_folder_path().c_str());
+
     // Init subsystems
     if (!resource_init()) {
         logger_quit();
         return false;
     }
-    resource_open_pack();
+    resource_begin_bulk_load();
     if (!render_init(state.window)) {
         logger_quit();
         return false;
@@ -367,7 +371,7 @@ bool gold_init(const LaunchOptions& launch_options) {
         logger_quit();
         return false;
     }
-    resource_close_pack();
+    resource_end_bulk_load();
 
     input_init(state.window);
     // TODO
@@ -626,7 +630,7 @@ RawMap* gold_generate_map(int* lcg_seed) {
 #ifdef GOLD_STEAM
 
 bool gold_steam_restart_app_if_necessary() {
-    return SteamAPI_RestartAppIfNecessary(GOLD_STEAM_APP_ID));
+    return SteamAPI_RestartAppIfNecessary(GOLD_STEAM_APP_ID);
 }
 
 bool gold_steam_api_init() {
@@ -671,6 +675,9 @@ void gold_debug_handle_input() {
     }
     if (input_is_action_just_pressed(INPUT_ACTION_TURBO)) {
         state.playback_speed = state.playback_speed == 1 ? 4 : 1;
+    }
+    if (input_is_action_just_pressed(INPUT_ACTION_F6)) {
+        render_take_screenshot();
     }
 }
 
@@ -720,7 +727,9 @@ void gold_debug_begin_editor_playtest() {
     // Setup network
     network_set_backend(NETWORK_BACKEND_LAN);
     network_open_lobby("Test Game", NETWORK_LOBBY_PRIVACY_SINGLEPLAYER);
+#ifndef GOLD_STEAM
     network_set_username("Player");
+#endif
 
     // Init shell
     state.match_shell = match_shell_init_scenario(editor_get_scenario(), editor_get_scenario_script_path().c_str());
@@ -749,7 +758,7 @@ void gold_debug_get_rand_seed_override(int* /*lcg_seed*/) {}
 void gold_debug_handle_input() {}
 void gold_debug_render_info() {}
 bool gold_debug_init_desync(const char* /*desync_foldername*/) { return true; }
-void gold_debug_begin_editor_playtest();
+void gold_debug_begin_editor_playtest() {}
 
 #endif
 

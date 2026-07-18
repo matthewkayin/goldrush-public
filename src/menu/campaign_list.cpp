@@ -19,20 +19,10 @@ static const Rect CAMPAIGN_INFO_RECT = {
 };
 
 std::string menu_get_campaign_saves_path() {
-    return filesystem_get_data_path() + "campaign_saves.json";
+    return filesystem_get_saves_folder_path() + "campaign.json";
 }
 
-void menu_load_campaign_saves(MenuState* state) {
-    // Start by clearing the campaign saves
-    state->campaign_saves.clear();
-
-    // Open campaign saves file
-    Json* campaign_saves_json = json_read(menu_get_campaign_saves_path().c_str());
-    if (campaign_saves_json == NULL) {
-        log_info("No campaign saves file found.");
-        return;
-    }
-
+void menu_set_campaign_saves_from_json(MenuState* state, Json* campaign_saves_json) {
     // Get the entries list
     Json* campaign_saves_entries_json = json_object_get(campaign_saves_json, "entries");
     if (campaign_saves_entries_json == NULL || campaign_saves_entries_json->type != JSON_TYPE_ARRAY) {
@@ -63,9 +53,33 @@ void menu_load_campaign_saves(MenuState* state) {
         state->campaign_saves.push_back(entry);
         log_debug("Loaded campaign save %s missions completed %u.", entry.name, entry.missions_completed);
     }
+}
 
-    json_free(campaign_saves_json);
-    log_info("Loaded campaign saves.");
+void menu_load_campaign_saves(MenuState* state) {
+    // Start by clearing the campaign saves
+    state->campaign_saves.clear();
+
+    // Open campaign saves file
+    Json* campaign_saves_json = json_read(menu_get_campaign_saves_path().c_str());
+    if (campaign_saves_json) {
+        menu_set_campaign_saves_from_json(state, campaign_saves_json);
+        json_free(campaign_saves_json);
+        log_info("Loaded campaign saves.");
+        return;
+    }
+
+    // Check the backup path
+    std::string campaign_saves_path = filesystem_get_data_path() + "campaign_saves.json";
+    campaign_saves_json = json_read(campaign_saves_path.c_str());
+    if (campaign_saves_json) {
+        menu_set_campaign_saves_from_json(state, campaign_saves_json);
+        json_free(campaign_saves_json);
+        menu_save_campaign_saves(state);
+        log_info("Loaded campaign saves from old path.");
+        return;
+    }
+
+    log_info("No campaign saves found.");
 }
 
 void menu_save_campaign_saves(const MenuState* state) {

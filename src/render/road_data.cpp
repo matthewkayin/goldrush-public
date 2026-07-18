@@ -144,7 +144,7 @@ void render_generate_road_data() {
 
 #else
 
-void menu_generate_road_data();
+void render_generate_road_data() {}
 
 #endif
 

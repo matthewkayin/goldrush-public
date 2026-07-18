@@ -1,6 +1,7 @@
-#include "core/ui.h"
 #include "menu.h"
 
+#include "core/achievements.h"
+#include "core/ui.h"
 #include "core/sound.h"
 #include "menu/types.h"
 #include "render/sprite.h"
@@ -143,6 +144,7 @@ void menu_campaign_update(MenuState* state) {
     ui_element_position(state->ui_context, ivec2(CAMPAIGN_SIDEBAR.x + (CAMPAIGN_SIDEBAR.w / 2) - (header_text_size.x / 2), 14));
     ui_text(state->ui_context, FONT_HACK_GOLD, selected_save.name);
 
+    // Campaign mission description
     if (state->campaign_mission_selected != CAMPAIGN_MISSION_NONE) {
         const CampaignScenarioInfo& scenario_info = CAMPAIGN_SCENARIO_INFO[state->campaign_mission_selected];
 
@@ -183,6 +185,17 @@ void menu_campaign_update(MenuState* state) {
         ui_end_container(state->ui_context);
     }
 
+    // If none selected, prompt player to click an orb
+    if (state->campaign_mission_selected == CAMPAIGN_MISSION_NONE) {
+        const char* text = "Click a level orb on the map to begin!";
+        ivec2 text_size = render_get_text_size(FONT_HACK_GOLD, text);
+        ivec2 text_position = ivec2(
+            (CAMPAIGN_SIDEBAR.x + 8) + ((CAMPAIGN_SIDEBAR.w - 16) / 2) - (text_size.x / 2),
+            CAMPAIGN_SIDEBAR.y + 28);
+        ui_element_position(state->ui_context, ivec2(text_position));
+        ui_text(state->ui_context, FONT_HACK_GOLD, text);
+    }
+
     // Button row
     if (state->campaign_road_reveal_timer == 0) {
         ui_begin_row(state->ui_context, ivec2(CAMPAIGN_SIDEBAR.x + 4, CAMPAIGN_SIDEBAR.y + CAMPAIGN_SIDEBAR.h + 4), 4);
@@ -215,6 +228,7 @@ void menu_campaign_on_scenario_finished(MenuState* state, uint32_t playtime_seco
         if (state->campaign_mission_selected == CAMPAIGN_SCENARIO_COUNT - 1) {
             selected_save.missions_completed++;
             menu_save_campaign_saves(state);
+            achievement_grant(ACHIEVEMENT_MANIFEST_DESTINY);
             menu_set_mode(state, MENU_MODE_CREDITS);
         } else {
             menu_campaign_begin_road_reveal(state);

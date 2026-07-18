@@ -59,8 +59,8 @@ void menu_username_dialog(MenuState* state) {
 
 #else
 
-void menu_username_prompt_if_empty(MenuState* state) {}
-void menu_username_button(MenuState* state) {}
-void menu_username_dialog(MenuState* state) {}
+void menu_username_prompt_if_empty(MenuState* /*state*/) {}
+void menu_username_button(MenuState* /*state*/) {}
+void menu_username_dialog(MenuState* /*state*/) {}
 
 #endif

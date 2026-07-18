@@ -6,7 +6,7 @@ local entities = require("entities")
 
 local OBJECTIVE_DEFEND_POSITION = "Defend your Position"
 
-local COUNTDOWN_DURATION = 20 * 60
+local COUNTDOWN_DURATION = 15 * 60
 
 local ENEMY1 = 1
 local ENEMY2 = 2
@@ -37,11 +37,14 @@ local SPAWN_INFO = {
 local wave_index = 1
 local next_wave_spawn_time = nil
 local WAVE_INTERVAL = 75
+local LAST_WAVE_INTERVAL = 90
 local WAVE_LEVELS = {
-    1, 2, 1, 2, 3,
-    2, 3, 2, 3, 4,
-    3, 4, 3, 5, 5
+    1, 2, 1,
+    2, 3, 2,
+    3, 4, 3,
+    4, 5
 }
+local is_match_over = false
 
 function scenario_init()
     actions.run(function ()
@@ -77,6 +80,7 @@ function scenario_update()
     objectives.update()
 
     if next_wave_spawn_time ~= nil and scenario.are_objectives_complete() then
+        is_match_over = true
         actions.run(function()
             objectives.announce_objectives_complete()
             scenario.set_match_over_victory()
@@ -84,11 +88,26 @@ function scenario_update()
         next_wave_spawn_time = nil
     end
 
+    local player_hall = entities.get_by_id(scenario.constants.PLAYER_HALL)
+    local player_hall_is_defeated = player_hall == nil or player_hall.health == 0
+    if not is_match_over and player_hall_is_defeated then
+        is_match_over = true
+        actions.run(function()
+            objectives.announce_objectives_failed()
+            scenario.set_match_over_defeat()
+        end)
+    end
+
     if next_wave_spawn_time ~= nil and wave_index <= #WAVE_LEVELS and scenario.get_time() >= next_wave_spawn_time then
         scenario.log("Spawning wave ", wave_index, " at time ", scenario.get_time())
         spawn_wave(WAVE_LEVELS[wave_index])
-        next_wave_spawn_time = next_wave_spawn_time + WAVE_INTERVAL
+
         wave_index = wave_index + 1
+        if wave_index == #WAVE_LEVELS then
+            next_wave_spawn_time = next_wave_spawn_time + LAST_WAVE_INTERVAL
+        else
+            next_wave_spawn_time = next_wave_spawn_time + WAVE_INTERVAL
+        end
     end
 
     actions.update()
@@ -144,7 +163,7 @@ function spawn_wave(level)
         squad_util.spawn_harass_squad({
             player_id = spawn_info.player_id,
             spawn_cell = spawn_info.spawn_cell,
-            target_cell = scenario.constants.TARGET,
+            target_cell = scenario.constants.TARGET_CELL,
             entity_types = entity_types
         })
 

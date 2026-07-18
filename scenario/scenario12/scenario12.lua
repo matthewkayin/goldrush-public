@@ -41,6 +41,7 @@ local enemy_center_hall_states = {
 local enemy_harass_states = {
     {
         player_id = ENEMY1,
+        use_unit_spawn_rates_at_level = 2,
         unit_spawn_rates = {
             { type = scenario.entity_type.COWBOY, rate = 0.4 },
             { type = scenario.entity_type.BANDIT, rate = 0.3 },
@@ -54,6 +55,7 @@ local enemy_harass_states = {
     },
     {
         player_id = ENEMY2,
+        use_unit_spawn_rates_at_level = 3,
         unit_spawn_rates = {
             { type = scenario.entity_type.SOLDIER, rate = 0.8 },
             { type = scenario.entity_type.CANNON, rate = 0.2 },
@@ -430,7 +432,7 @@ function enemy_harass_update(state)
 
     -- Determine unit types to choose from
     local unit_spawn_rates
-    if enemy_level == 1 then
+    if enemy_level < state.use_unit_spawn_rates_at_level then
         unit_spawn_rates = {
             { type = scenario.entity_type.COWBOY, rate = 0.5 },
             { type = scenario.entity_type.BANDIT, rate = 0.5 },

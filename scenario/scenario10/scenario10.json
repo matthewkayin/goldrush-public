@@ -1,5 +1,4 @@
 {
-	"script": "scenario10.lua",
 	"map_type": "Klondike",
 	"map_bake_lcg_seed": 41,
 	"map": {
@@ -16406,7 +16405,7 @@
 				"Wagon Armor",
 				"Land Mines",
 				"Bayonets",
-				"Serrated Knives",
+				"Getaway Boots",
 				"Iron Sights"
 			],
 			"allowed_entities": [
@@ -16481,6 +16480,7 @@
 		{
 			"type": "Gold Mine",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 122,
@@ -16490,6 +16490,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 13,
@@ -16499,6 +16500,7 @@
 		{
 			"type": "Town Hall",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 121,
@@ -16508,6 +16510,7 @@
 		{
 			"type": "Barracks",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 122,
@@ -16517,6 +16520,7 @@
 		{
 			"type": "Saloon",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 1,
@@ -16526,6 +16530,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 77,
@@ -16535,6 +16540,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 123,
@@ -16544,6 +16550,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 6,
@@ -16553,6 +16560,7 @@
 		{
 			"type": "Cannoneer",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 117,
@@ -16562,6 +16570,7 @@
 		{
 			"type": "Sapper",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 11,
@@ -16571,6 +16580,7 @@
 		{
 			"type": "Cannoneer",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 118,
@@ -16580,6 +16590,7 @@
 		{
 			"type": "Saloon",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 76,
@@ -16589,6 +16600,7 @@
 		{
 			"type": "Miner",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 19,
@@ -16598,6 +16610,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 62,
@@ -16607,6 +16620,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 17,
@@ -16616,6 +16630,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 26,
@@ -16625,6 +16640,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 12,
@@ -16634,6 +16650,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 7,
@@ -16643,6 +16660,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 14,
@@ -16652,6 +16670,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 9,
@@ -16661,6 +16680,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 11,
@@ -16670,6 +16690,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 21,
@@ -16679,6 +16700,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 38,
@@ -16688,6 +16710,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 42,
@@ -16697,6 +16720,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 40,
@@ -16706,6 +16730,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 28,
@@ -16715,6 +16740,7 @@
 		{
 			"type": "Saloon",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 31,
@@ -16724,6 +16750,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 5,
@@ -16733,6 +16760,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 10,
@@ -16742,6 +16770,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 9,
@@ -16751,6 +16780,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 6,
@@ -16760,6 +16790,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 107,
@@ -16769,6 +16800,7 @@
 		{
 			"type": "Bunker",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 28,
@@ -16778,6 +16810,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 16,
@@ -16787,6 +16820,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 21,
@@ -16796,6 +16830,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 27,
@@ -16805,6 +16840,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 27,
@@ -16814,6 +16850,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 27,
@@ -16823,6 +16860,7 @@
 		{
 			"type": "Gold Mine",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 67,
@@ -16832,6 +16870,7 @@
 		{
 			"type": "Town Hall",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 67,
@@ -16841,6 +16880,7 @@
 		{
 			"type": "Saloon",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 57,
@@ -16850,6 +16890,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 75,
@@ -16859,6 +16900,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 79,
@@ -16868,6 +16910,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 69,
@@ -16877,6 +16920,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 59,
@@ -16886,6 +16930,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 55,
@@ -16895,6 +16940,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 53,
@@ -16904,6 +16950,7 @@
 		{
 			"type": "Workshop",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 22,
@@ -16913,6 +16960,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 51,
@@ -16922,6 +16970,7 @@
 		{
 			"type": "Bunker",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -16931,6 +16980,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 50,
@@ -16940,6 +16990,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 31,
@@ -16949,6 +17000,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 116,
@@ -16958,6 +17010,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 117,
@@ -16967,6 +17020,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -16976,6 +17030,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 103,
@@ -16985,6 +17040,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 104,
@@ -16994,6 +17050,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 102,
@@ -17003,6 +17060,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 24,
@@ -17012,6 +17070,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 108,
@@ -17021,6 +17080,7 @@
 		{
 			"type": "Chicken Coop",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 118,
@@ -17030,6 +17090,7 @@
 		{
 			"type": "Chicken Coop",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 120,
@@ -17039,6 +17100,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 113,
@@ -17048,6 +17110,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 119,
@@ -17057,6 +17120,7 @@
 		{
 			"type": "Sapper",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 25,
@@ -17066,6 +17130,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 106,
@@ -17075,6 +17140,7 @@
 		{
 			"type": "Sheriff's Office",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 78,
@@ -17084,6 +17150,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 64,
@@ -17093,6 +17160,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 50,
@@ -17102,6 +17170,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 60,
@@ -17111,6 +17180,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 51,
@@ -17120,6 +17190,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 70,
@@ -17129,6 +17200,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 66,
@@ -17138,6 +17210,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 58,
@@ -17147,6 +17220,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 56,
@@ -17156,6 +17230,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 10,
@@ -17165,6 +17240,7 @@
 		{
 			"type": "Saloon",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 93,
@@ -17174,6 +17250,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 109,
@@ -17183,6 +17260,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 113,
@@ -17192,6 +17270,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 41,
@@ -17201,6 +17280,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 76,
@@ -17210,6 +17290,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 5,
@@ -17219,6 +17300,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 63,
@@ -17228,6 +17310,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 51,
@@ -17237,6 +17320,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 49,
@@ -17246,6 +17330,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 38,
@@ -17255,6 +17340,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 112,
@@ -17264,6 +17350,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 108,
@@ -17273,6 +17360,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 54,
@@ -17282,6 +17370,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 62,
@@ -17291,6 +17380,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 110,
@@ -17300,6 +17390,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 76,
@@ -17309,6 +17400,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 75,
@@ -17318,6 +17410,7 @@
 		{
 			"type": "Sapper",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 10,
@@ -17327,6 +17420,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 62,
@@ -17336,6 +17430,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 35,
@@ -17345,6 +17440,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 60,
@@ -17354,6 +17450,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 118,
@@ -17363,6 +17460,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 61,
@@ -17372,6 +17470,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 116,
@@ -17381,6 +17480,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 72,
@@ -17390,6 +17490,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 73,
@@ -17399,6 +17500,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 72,
@@ -17408,6 +17510,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 12,
@@ -17417,6 +17520,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 67,
@@ -17426,6 +17530,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 67,
@@ -17435,6 +17540,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 71,
@@ -17444,6 +17550,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 30,
@@ -17453,6 +17560,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 50,
@@ -17462,6 +17570,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 113,
@@ -17471,6 +17580,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 95,
@@ -17480,6 +17590,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 39,
@@ -17489,6 +17600,7 @@
 		{
 			"type": "Sapper",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 37,
@@ -17498,6 +17610,7 @@
 		{
 			"type": "Wagon",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 44,
@@ -17507,6 +17620,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 43,
@@ -17516,6 +17630,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 38,
@@ -17525,6 +17640,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 9,
@@ -17534,6 +17650,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 39,
@@ -17543,6 +17660,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 118,
@@ -17552,6 +17670,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 30,
@@ -17561,6 +17680,7 @@
 		{
 			"type": "Gold Mine",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 22,
@@ -17570,6 +17690,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 113,
@@ -17579,6 +17700,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -17588,6 +17710,7 @@
 		{
 			"type": "Town Hall",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 14,
@@ -17597,6 +17720,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 117,
@@ -17606,6 +17730,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 41,
@@ -17615,6 +17740,7 @@
 		{
 			"type": "Gold Mine",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 99,
@@ -17624,6 +17750,7 @@
 		{
 			"type": "Town Hall",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 106,
@@ -17633,6 +17760,7 @@
 		{
 			"type": "Blacksmith",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 95,
@@ -17642,6 +17770,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 0,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 6,
@@ -17651,6 +17780,7 @@
 		{
 			"type": "Bunker",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 110,
@@ -17660,6 +17790,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 97,
@@ -17669,6 +17800,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 109,
@@ -17678,6 +17810,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 109,
@@ -17687,6 +17820,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 112,
@@ -17696,6 +17830,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 112,
@@ -17705,6 +17840,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 113,
@@ -17714,6 +17850,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 108,
@@ -17723,6 +17860,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 24,
@@ -17732,6 +17870,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 43,
@@ -17741,6 +17880,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 108,
@@ -17750,6 +17890,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 107,
@@ -17759,6 +17900,7 @@
 		{
 			"type": "Pyro",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 111,
@@ -17768,6 +17910,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 106,
@@ -17777,6 +17920,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -17786,6 +17930,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 122,
@@ -17795,6 +17940,7 @@
 		{
 			"type": "House",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -17804,6 +17950,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 112,
@@ -17813,6 +17960,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 122,
@@ -17822,6 +17970,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 120,
@@ -17831,6 +17980,7 @@
 		{
 			"type": "Crate",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 200,
 			"cell": {
 				"x": 124,
@@ -17840,6 +17990,7 @@
 		{
 			"type": "Gold Mine",
 			"player_id": 4,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 6,
@@ -17849,6 +18000,7 @@
 		{
 			"type": "Town Hall",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 13,
@@ -17858,6 +18010,7 @@
 		{
 			"type": "Bunker",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 42,
@@ -17867,6 +18020,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 41,
@@ -17876,6 +18030,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 41,
@@ -17885,6 +18040,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 44,
@@ -17894,6 +18050,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 44,
@@ -17903,6 +18060,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 102,
@@ -17912,6 +18070,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 103,
@@ -17921,6 +18080,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 116,
@@ -17930,6 +18090,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 117,
@@ -17939,6 +18100,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 98,
@@ -17948,6 +18110,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 99,
@@ -17957,6 +18120,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 116,
@@ -17966,6 +18130,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 115,
@@ -17975,6 +18140,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 99,
@@ -17984,6 +18150,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 116,
@@ -17993,6 +18160,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 114,
@@ -18002,6 +18170,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 115,
@@ -18011,6 +18180,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 116,
@@ -18020,6 +18190,7 @@
 		{
 			"type": "Barracks",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 114,
@@ -18029,6 +18200,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 106,
@@ -18038,6 +18210,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 67,
@@ -18047,6 +18220,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 74,
@@ -18056,6 +18230,7 @@
 		{
 			"type": "Soldier",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 105,
@@ -18065,6 +18240,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 63,
@@ -18074,6 +18250,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 14,
@@ -18083,6 +18260,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 15,
@@ -18092,6 +18270,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 14,
@@ -18101,6 +18280,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 15,
@@ -18110,6 +18290,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 10,
@@ -18119,6 +18300,7 @@
 		{
 			"type": "Miner",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 11,
@@ -18128,6 +18310,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 20,
@@ -18137,6 +18320,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 21,
@@ -18146,6 +18330,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 18,
@@ -18155,6 +18340,7 @@
 		{
 			"type": "Bandit",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 18,
@@ -18164,6 +18350,7 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 54,
@@ -18173,6 +18360,7 @@
 		{
 			"type": "Pyro",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 112,
@@ -18182,6 +18370,7 @@
 		{
 			"type": "Pyro",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 23,
@@ -18191,6 +18380,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 9,
@@ -18200,6 +18390,7 @@
 		{
 			"type": "Cowboy",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 10,
@@ -18209,10 +18400,51 @@
 		{
 			"type": "Land Mine",
 			"player_id": 1,
+			"is_rigged": false,
 			"gold_held": 0,
 			"cell": {
 				"x": 39,
 				"y": 90
+			}
+		},
+		{
+			"type": "Crate",
+			"player_id": 4,
+			"is_rigged": false,
+			"gold_held": 200,
+			"cell": {
+				"x": 61,
+				"y": 61
+			}
+		},
+		{
+			"type": "Crate",
+			"player_id": 4,
+			"is_rigged": false,
+			"gold_held": 200,
+			"cell": {
+				"x": 111,
+				"y": 5
+			}
+		},
+		{
+			"type": "Crate",
+			"player_id": 4,
+			"is_rigged": false,
+			"gold_held": 200,
+			"cell": {
+				"x": 112,
+				"y": 124
+			}
+		},
+		{
+			"type": "Crate",
+			"player_id": 4,
+			"is_rigged": false,
+			"gold_held": 200,
+			"cell": {
+				"x": 12,
+				"y": 104
 			}
 		}
 	],
@@ -18525,7 +18757,8 @@
 				92,
 				96,
 				91,
-				94
+				94,
+				193
 			]
 		},
 		{
