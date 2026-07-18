@@ -27,12 +27,12 @@ In this section, I will be discussing files under the `src` folder.
 
 `gold_main()` lives in `gold.cpp`. It's structure is as follows: 
   1. Initialize everything
-  2. Run the game loop 
-    a. Timekeep
-    b. Poll input events
-    c. Service the network and handle network events
-    d. Update the game logic
-    e. Render
+  2. Run the game loop  
+      1. Timekeep
+      2. Poll input events
+      3. Service the network and handle network events
+      4. Update the game logic
+      5. Render
   3. Deinitialize everything
 
 The game loop itself operates as a state machine in which there are three states:
@@ -59,13 +59,15 @@ Now that I've covered the basic project structure, here is an overview of each `
 
 One of the most important architectural concepts in this project is that the game state for the Match is divided into two structures, the `MatchShell` and the `MatchState`. 
 
-This is done because the game must be deterministic in order for the multiplayer to work. The `MatchState`, therefore, is the simulation; it contains all data which must be in-sync across all players. The `MatchShell`, meanwhile, is the orchestrator of the `MatchState`. It updates the `MatchState` according to network inputs, player inputs, and its own internal timer. The `MatchShell` also behaves differently when players a viewing a replay whereas the `MatchState` behaves the same. In this sense, you can almost think of the `MatchState` as being like a tape, where the `MatchShell` is a tape player that is capable of recording, rewinding, and playing back a tape.
+This is done because the game must be deterministic in order for the multiplayer to work. The `MatchState`, therefore, is the simulation; it contains all data which must be in-sync across all players. The `MatchShell`, meanwhile, is the orchestrator of the `MatchState`. It updates the `MatchState` according to network inputs, player inputs, and its own internal timer. The `MatchShell` also behaves differently when players are viewing a replay whereas the `MatchState` behaves the same. 
+
+In this sense, you can almost think of the `MatchState` as being like a tape, where the `MatchShell` is a tape player that is capable of recording, rewinding, and playing back a tape.
 
 ## Campaign Levels
 
 Adding the campaign to the game introduced a number of challenges because there are things that the campaign does that are different from regular gameplay. For example, campaign levels have pre-made maps whereas regular gameplay uses procedurally generated maps, and campaign levels have objectives and scripted behaviors whereas regular gameplay does not. The game accounts for these differences in the following ways:
   - There is a `Scenario` object which lives in the `match/scenario` folder. 
-    - This object contains all the data needing to load a level such as map data, unit spawn positions, player starting gold amounts, etc.
+    - This object contains all the data needed to load a level such as map data, unit spawn positions, player starting gold amounts, etc.
     - This object is also the "document" that the level editor edits. Scenarios can be saved and loaded either in a JSON format (for authoring) or in a custom binary `.scn` file format (for distribution).
   - In addition to its other initialization functions, the `MatchShell` can also be initialized by passing in a `Scenario`.
   - When loading from a `Scenario`, the `MatchShell` also accepts a Lua script path. The Lua script is then loaded and a Lua context is initialized, stored, and updated in the `MatchShell`.
@@ -78,7 +80,7 @@ Adding the campaign to the game introduced a number of challenges because there 
 
 Networking is handled by two different libraries, enet for LAN multiplayer and Steam for online multiplayer. This presented a bit of a challenge, because the two libraries, while providing similar features, behave a little differently. I wanted to provide an interface that allowed the game to make network calls without worrying about which library it was using on the backend. Additionally, there were certain shared behaviors that I wanted to keep between both implementations. For example, when a player joins a lobby, there is a specific handshake that occurs to get everyone connected on a peer-to-peer basis (the joiner introduces themselves to the server, the server introduces the joiner to the other players, and the other players introduce themselves to the joiner), and I wanted to keep this handshake consistent across both backends.
 
-The solution was to introduce the concept of a network backend and frontend. The frontend is contained in `network/network.cpp`, and it contains all of the functions which are used directly by the game. These frontend functions are also where shared behavior, such as the aforementioned handshake, is implemented. The frontend contains a refernce to two abstract classes which are instantiated differently depending on the selected backend. These classes are:
+The solution was to introduce the concept of a network backend and frontend. The frontend is contained in `network/network.cpp`, and it contains all of the functions which are used directly by the game. These frontend functions are also where shared behavior, such as the aforementioned handshake, is implemented. The frontend contains a pointer to two abstract classes which are instantiated differently depending on the selected backend. These classes are:
  - `INetworkHost` - Connects to other network "peers" and sends and receives messages between them.
  - `INetworkScanner` - Scans for lobbies available on the network.
 
