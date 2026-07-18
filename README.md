@@ -6,6 +6,8 @@ This is the public-facing repo of my game Gold Rush. This repo contains all of t
 
 Gold Rush is a Wild West real-time strategy game developed in C++ and OpenGL. As of the time of writing, the game is feature-complete and is planned to be released on Steam for Windows, Mac, and Linux in Fall of 2026. [Steam Page](https://store.steampowered.com/app/3774270/Gold_Rush/)
 
+The rest of this README contains technical info. If you want to learn more about some of the interesting problems I solved while working on this, check out [this article](http://www.matthewkayin.com/goldrush.html) from my portfolio site.
+
 ## Project Structure
 
 If you're interested in poking around the code, here is a brief overview of the project structure.
