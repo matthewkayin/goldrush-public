@@ -8,6 +8,8 @@ Gold Rush is a Wild West real-time strategy game developed in C++ and OpenGL. As
 
 The rest of this README contains technical info. If you want to learn more about some of the interesting problems I solved while working on this, check out [this article](http://www.matthewkayin.com/goldrush.html) from my portfolio site.
 
+![Gold Rush Gameplay Footage](./img/goldrush_portfolio_soldiers.gif)
+
 ## Project Structure
 
 If you're interested in poking around the code, here is a brief overview of the project structure.
